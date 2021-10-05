@@ -1,0 +1,102 @@
+@import '../../theme-colors.scss';
+
+.book {
+    /*display: flex;
+    flex: 1;
+    flex-direction: row;*;
+    position: relative;
+    /*background-color: $dark-red;
+    color: $slammin-salmon;*/
+    margin-top: 20pt !important;
+    padding: 8pt;
+    border-radius: 3pt;
+    max-width: 170pt;
+    transition: transform .2s;
+}
+
+.book:hover {
+    transform: scale(1.02);
+    cursor: pointer;
+}
+
+.book-spine-content-container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.book-favorite-indicator-container {
+    display: block;
+    height: 50pt;
+    font-size: 60pt;
+    margin: auto;
+    margin-bottom: 40pt;
+    margin-top: -30pt;
+    /*color: $slammin-salmon;*/
+}
+
+
+.book-title-container {
+    min-height: 180pt;
+    margin-bottom: 50pt;
+    
+}
+
+.book-title {
+    /*position: absolute;*/
+    display: inline;
+    text-align: center;
+    font-size: 16pt;
+    /*color: $light-pink;*/
+}
+
+.variable-width-spacer-s {
+    
+    width: 50pt;
+    height: 2pt;
+}
+
+.variable-width-spacer-m {
+    
+    width: 115pt;
+    height: 2pt;
+}
+
+.variable-width-spacer-l {
+    
+    width: 150pt;
+    height: 2pt;
+}
+
+
+.book-author {
+    margin: auto;
+    width: fit-content;
+    display: block;
+    /*position: absolute;
+    bottom: 10pt;*/
+    text-align: center;
+    left: 50%;
+    font-family: ivypresto-headline, garamond, serif;
+    font-weight: 100;
+    /*color: $slammin-salmon;*/
+}
+
+/*@media only screen and (max-width: 750px) {
+    .book {
+        transform: scale(.75);
+        margin-top: 0pt;
+    }
+    .book:hover {
+        transform: scale(.8);
+    }
+}
+
+@media only screen and (max-width: 375px) {
+    .book {
+        transform: scale(.5);
+    }
+    .book:hover {
+        transform: scale(.65);
+    }
+}*/

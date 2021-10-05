@@ -1,0 +1,73 @@
+@import '../../theme-colors.scss';
+
+.book-red {
+    background-color: $dark-red;
+    margin-right: 1pt + random($limit: 2);
+    color: $slammin-salmon;
+    .book-title {
+        color: $light-pink;
+    }
+}
+
+.book-orange {
+    background-color: $dark-orange;
+    margin-right: 1pt + random($limit: 3);
+    color: $orange;
+    .book-title {
+        color: $light-orange;
+    }
+}
+
+.book-yellow {
+    background-color: $dark-yellow;
+    margin-right: 1pt + random($limit: 5);
+    color: $yellow;
+    .book-title {
+        color: $light-yellow;
+    }
+}
+
+.book-cyan {
+    background-color: $dark-teal;
+    margin-right: 1pt + random($limit: 3);
+    color: $cyan;
+    .book-title {
+        color: $light-cyan;
+    }
+}
+
+.book-green {
+    background-color: $dark-green;
+    margin-right: 1pt + random($limit: 3);
+    color: $green;
+    .book-title {
+        color: $light-green;
+    }
+}
+
+.book-blue {
+    background-color: $dark-blue;
+    margin-right: 1pt + random($limit: 3);
+    color: $blue;
+    .book-title {
+        color: $light-blue;
+    }
+}
+
+.book-purple {
+    background-color: $dark-purple;
+    margin-right: 1pt + random($limit: 3);
+    color: $purple;
+    .book-title {
+        color: $light-purple;
+    }
+}
+
+.book-brown {
+    background-color: $dark-brown;
+    margin-right: 1pt + random($limit: 3);
+    color: $brown;
+    .book-title {
+        color: $light-brown;
+    }
+}
