@@ -20,7 +20,7 @@ $teal:    #20c997;
 $cyan:    #0dcaf0;*/
 
 $slammin-salmon: #F7525F;
-$dark-red : #4C0F16;
+$dark-red : #370301;
 $light-pink : #F9D9DD;
 
 $orange : #EF8E25;
@@ -64,14 +64,14 @@ $gray-800: #343a40;
 $gray-900: #212529;
 $black:    #000;
 
-$primary:       $dark-blue;
-$secondary:     $brown;
+$primary:       $light-pink;
+$secondary:     $slammin-salmon;
 $success:       $green;
 $info:          $cyan;
 $warning:       $yellow;
-$danger:        $slammin-salmon;
+$danger:        $orange;
 $light:         $light-brown;
-$dark:          $dark-brown;
+$dark:          $dark-red;
 
 $theme-colors: (
   "primary":    $primary,
