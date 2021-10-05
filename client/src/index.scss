@@ -1,0 +1,24 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css");
+@import './theme-colors.scss';
+@import './node_modules/bootstrap/scss/bootstrap.scss';
+@import url("https://use.typekit.net/xbk5doo.css");
+
+body {
+	color: map-get($theme-colors, "primary");
+	font-family: freight-sans-pro-lights, sans-serif;
+	font-weight: 300;
+	font-style: normal;
+	font-size: 14pt;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: freight-sans-pro, sans-serif;
+	font-weight: 700;
+	font-style: normal;
+}
+
+.display {
+	font-family: freight-sans-pro-ultra, sans-serif;
+	font-weight: 900;
+	font-style: normal;
+}

@@ -1,0 +1,12 @@
+@import '../../theme-colors.scss';
+
+#search-results-container {
+    background-color: white;
+    text-align: center;
+}
+
+@media only screen and (max-width: 375px) {
+    table, thead, th, tbody, tr, td {
+        font-size: 11pt;
+    }
+}

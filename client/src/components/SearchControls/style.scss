@@ -1,0 +1,74 @@
+@import '../../theme-colors.scss';
+
+
+#search-controls-container-bg {
+    text-align: center;
+    margin: auto;
+    width: 100%;
+    background-color: $latte;
+}
+
+#search-controls-container-w {
+    margin: auto;
+    width: 320pt;
+    display: flex;
+    flex: 1;
+    
+}
+
+.search-wrapper { 
+    padding: 6pt 6pt 4pt 6pt;
+    margin: 0pt 6pt 15pt 6pt;
+    border: none;
+    border-bottom: solid;
+    border-color: $dark-brown;
+    border-width: 1pt;
+    background-color: $latte;
+    width: 100%;
+}
+
+textarea {
+    margin: 0pt;
+    padding: 0pt;
+    text-align: center;
+    transform: translateX(-50pt);
+}
+
+#google-books-search-input {
+    background-color: #0000;
+    color: $dark-blue;
+    border: none;
+    /*font-size: 18pt;*/
+    text-align: center;
+    transform: translateX(-10pt);
+    transform: translateY(4pt);
+    resize: none;
+}
+
+#google-books-search-input:focus {
+    border: none;
+    background-color: #0000;
+    outline: none !important;
+}
+
+#search-icon {
+    transform: translateX(-5pt);
+}
+
+@media only screen and (max-width: 750px) {
+    textarea {
+        font-size: 14pt;
+    }
+    #search-controls-container-w {
+        width: 250pt;
+    }
+}
+
+@media only screen and (max-width: 375px) {
+    textarea {
+        font-size: 12pt;
+    }
+    #search-controls-container-w {
+        width: 200pt;
+    }
+}
