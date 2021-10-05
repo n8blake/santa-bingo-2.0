@@ -13,21 +13,7 @@ import './App.scss';
 function App() {
   return (
     <StoreProvider>
-      <Router>
-        <Header />
-        <Switch>
-          <Route exact path={["/", "/search"]}>
-            <SearchPage />
-          </Route>
-          <Route exact path={["/library", "/books", "/favorites", "/loved"]}>
-            <FavoritesPage />
-          </Route>
-          <Route>
-            <NoMatch />
-          </Route>
-        </Switch>
-      </Router>
-      <ActiveBook />
+      <h1 className="display">SantA Bingo!</h1>
     </StoreProvider>
     
   );
