@@ -7,8 +7,7 @@ function Header() {
 
 	return(
 		<div className="jumbotron">
-			<h1 className="display hero-text">The Library</h1>
-			<p className="subtitle hero-subtitle">because reading is fundamental</p>
+			<h1 className="display hero-text">Santa Bingo</h1>
 			<nav className="pageLinkBtn">
 			{((location.pathname.toLowerCase() ===  '/search') ||  location.pathname.toLowerCase() ===  '/' ) ? (
 				<Link to="/favorites" style={{ textDecoration: 'none' }}>
