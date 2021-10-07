@@ -6,8 +6,8 @@ function NoMatch() {
         <div className="container">
             <div className="no-match-message">
             <h1>404</h1>
-            <h2>🙄</h2>
-            <p>ugh. the page can't be found.</p>
+            <h2>🎅🏼</h2>
+            <p>ho ho... oh. the page can't be found.</p>
             </div>
         </div>
     )
