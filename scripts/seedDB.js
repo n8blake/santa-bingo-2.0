@@ -1,25 +1,36 @@
 const mongoose = require("mongoose");
 const db = require("../models");
-const Book = db.Book;
+const User = db.User;
 
 mongoose.connect(
     process.env.MONGODB_URI ||
-    "mongodb://localhost/bookbuddy-n8blake"
+    "mongodb://localhost/santa-bingo-n8blake"
 );
 
-const BOOKS = [
-	{
-		'authors': ["Suzanne Collins"],
-		'description': "Set in a dark vision of the near future, a terrifying reality TV show is taking place. Twelve boys and twelve girls are forced to appear in a live event called The Hunger Games. There is only one rule: kill or be killed. When sixteen-year-old Katniss Everdeen steps forward to take her younger sister's place in the games, she sees it as a death sentence. But Katniss has been close to death before. For her, survival is second nature.",
-		'image': "http://books.google.com/books/content?id=sazytgAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
-		'link': "http://books.google.com/books?id=sazytgAACAAJ&dq=title:The+Hunger+Games&hl=&source=gbs_api",
-		'title': "The Hunger Games"
-	}	  
+const USERS = [
+	  {
+          firstName: "Nate",
+          lastName: "Blake",
+          displayName: "Nate",
+          email: "n8blake@mac.com"
+      },
+      {
+        firstName: "Spencer",
+        lastName: "Blake",
+        displayName: "Spencer",
+        email: "spencer.blake@slcc.edu"
+    },
+    {
+        firstName: "Kristin",
+        lastName: "Cooper",
+        displayName: "Kristin",
+        email: "katiedean@mac.com"
+    },
 ];
 
-Book
+User
     .remove({})
-    .then(() => Book.collection.insertMany(BOOKS))
+    .then(() => User.collection.insertMany(USERS))
     .then(data => {
         console.log(data.result.n + " records insterted!");
         process.exit(0);
