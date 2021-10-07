@@ -5,7 +5,7 @@ const Model = mongoose.model;
 const GameSchema = new Schema({
     start_time: { type: Date, required: true },
     end_time: { type: Date },
-    nubmers: { type: Array }
+    numbers: { type: Array }
 });
 
 const Game = Model("Game", GameSchema);
