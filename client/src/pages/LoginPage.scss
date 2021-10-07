@@ -1,0 +1,37 @@
+@import '../theme-colors.scss';
+
+.login-form {
+    text-align: center;
+    width: 350pt;
+    margin: auto;
+}
+
+input {
+    background-color: #00000000;
+    color: white;
+    border: none;
+    font-size: 16pt;
+    width: 100%;
+}
+
+input:focus {
+    border: none;
+    background-color: #00000000;
+    outline: none !important;
+}
+
+.input-wrapper {
+    display: flex;
+    flex: 1;
+    padding: 6pt 15pt 6pt 6pt;
+    margin: 0pt 6pt 10pt 6pt;
+    border-bottom: solid;
+    border-color: $secondary;
+    border-width: 1pt;
+    border-radius: 0pt;
+}
+
+.input-glyph {
+    margin: 0pt 10pt;
+    font-size: 16pt;
+}
