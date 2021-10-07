@@ -1,6 +1,6 @@
 export const SET_VIEW_MODE = "SET_VIEW_MODE";
 export const LOADING = "LOADING";
-export const UPDATE_BOOKS = "UPDATE_BOOKS";
-export const SEARCH = "SEARCH";
-export const UPDATE_SEARCH_RESULTS = "UPDATE_SEARCH_RESULTS";
-export const SET_ACTIVE_BOOK = "SET_ACTIVE_BOOK";
+export const LOGIN = "LOGIN";
+export const SET_TOKEN = "SET_TOKEN";
+export const VALIDATE_TOKEN = "VALIDATE_TOKEN";
+export const SET_EMAIL = "SET_EMAIL";
