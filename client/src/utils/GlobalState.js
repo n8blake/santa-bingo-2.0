@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, useContext } from "react";
 // import actions 
-import { SET_VIEW_MODE, UPDATE_BOOKS, SEARCH, UPDATE_SEARCH_RESULTS, LOADING, SET_ACTIVE_BOOK } from "./actions";
+import { LOGIN, LOADING, SET_TOKEN, VALIDATE_TOKEN, SET_EMAIL } from "./actions";
 
 const StoreContext = createContext();
 const { Provider } = StoreContext;
@@ -8,32 +8,25 @@ const { Provider } = StoreContext;
 const reducer = (state, action) => {
     // switch on action type
     switch(action.type){
-        case SET_VIEW_MODE:
+        case LOGIN: 
             return {
                 ...state,
-                viewMode: action.viewMode,
-                loading: false
+                loggedIn: action.login,
             }
-        case UPDATE_BOOKS:
+        case SET_TOKEN:
             return {
                 ...state,
-                books: [...action.books],
-                loading: false
+                token: action.token
             }
-        case SEARCH:
+        case VALIDATE_TOKEN: 
             return {
                 ...state,
-                searchTerm: action.searchTerm
+                validToken: action.isValid
             }
-        case UPDATE_SEARCH_RESULTS:
+        case SET_EMAIL:
             return {
                 ...state,
-                searchResults: {...action.searchResults}
-            }
-        case SET_ACTIVE_BOOK:
-            return {
-                ...state,
-                activeBook: action.activeBook
+                email: action.email
             }
         case LOADING: 
             return {
@@ -47,10 +40,11 @@ const reducer = (state, action) => {
 
 const StoreProvider = ({value = [], ...props}) => {
     const [state, dispatch] = useReducer(reducer, {
-        books: [],
-        activeBook: {},
-        searchTerm: "",
-        searchResults: [],
+        loggedIn: false,
+        token:"",
+        validToken:false,
+        userName:"",
+        email: "",
         loading: false
     });
 
