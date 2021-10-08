@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { useStoreContext } from "../GlobalState";
+import { BrowserRouter as Router, Route, Switch, Redirect, render } from "react-router-dom";
+import { useStoreContext } from './GlobalState';
 
 // A wrapper for <Route> that redirects to the login
 // screen if you're not yet authenticated.
@@ -11,7 +11,7 @@ function PrivateRoute({ children, ...rest }) {
       <Route
         {...rest}
         render={({ location }) =>
-          state.token && state.validToken ? (
+          state.validToken ? (
             children
           ) : (
             <Redirect

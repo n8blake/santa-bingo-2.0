@@ -7,6 +7,6 @@ const usersRoutes = require("./users");
 // use routes
 router.use("/login", loginRoutes);
 router.use("/logout", logoutRoute);
-routers.use("/users", usersRoutes);
+router.use("/users", usersRoutes);
 
 module.exports = router;

@@ -1,9 +1,11 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { StoreProvider, useStoreContext } from './utils/GlobalState';
+import PrivateRoute from './utils/privateRoute';
 import LoginPage from './pages/LoginPage';
 import Home from './pages/Home';
 import Header from './components/Header';
+import ProfilePage from "./pages/ProfilePage";
 import NoMatch from "./pages/NoMatch";
 import './App.scss';
 
@@ -16,6 +18,9 @@ function App() {
         <Switch>
           <Route exact path={"/"} children={<Home />} />
           <Route exact path={["/login/:token", "/login"]} children={<LoginPage />} />
+          
+            <Route exact path={"/profile"} children={<ProfilePage />}/>
+          
           <Route>
             <NoMatch />
           </Route>

@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(compression());
 
 if (process.env.NODE_ENV === 'development') {
-  app.set('trust proxy', 1) // trust first proxy
+  //app.set('trust proxy', 1) // trust first proxy
   //sess.cookie.secure = true // serve secure cookies
 }
 
