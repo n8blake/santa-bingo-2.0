@@ -16,11 +16,13 @@ function App() {
       <Router>
         <Header />
         <Switch>
-          <Route exact path={"/"} children={<Home />} />
+          
           <Route exact path={["/login/:token", "/login"]} children={<LoginPage />} />
-          
+
+          <PrivateRoute>
+            <Route exact path={"/"} children={<Home />} />
             <Route exact path={"/profile"} children={<ProfilePage />}/>
-          
+          </PrivateRoute>
           <Route>
             <NoMatch />
           </Route>
