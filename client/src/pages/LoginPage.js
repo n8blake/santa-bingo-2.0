@@ -16,17 +16,23 @@ import "./LoginPage.scss";
 function LoginPage(props) {
     const [state, dispatch] = useStoreContext();
     const [email, setEmail] = useState("");
+    const [name, setName] = useState("");
     const debouncedEmail = useDebounce(email, 500);
 
     const handleInputChange = event => {
-        const email = event.target.value;
-        setEmail(event.target.value);
+        if(event.target.name === 'email') {
+            //const email = event.target.value;
+            setEmail(event.target.value);
+        } else {
+            //const name = event.target.value;
+            setName(event.target.value);
+        }
     }
 
     let token;
 
     const submitLogin = () => {
-        API.login(email).then(result => {
+        API.login(email, name).then(result => {
             console.log(result);
             if(result.data){
                 if(result.data.token){
@@ -45,7 +51,10 @@ function LoginPage(props) {
                     });
                 }
             }
-        });
+        })
+        .catch(err => {
+            console.log(err);
+        })
     }
 
     const validateToken = (token) => {
@@ -81,6 +90,9 @@ function LoginPage(props) {
                 });
             }
         })
+        .catch(err => {
+            console.log(err);
+        })
     }
 
     useEffect(() => {
@@ -94,6 +106,9 @@ function LoginPage(props) {
                     }
                 }
             })
+            .catch(err => {
+                console.log(err);
+            })
         }
 
         if(token){
@@ -106,11 +121,15 @@ function LoginPage(props) {
         <div className="container">
             {!state.validToken ? (
                 <div className="login-form">
-                    <div className="input-wrapper">
-                        <input type="text" name="email" placeholder="email address" onChange={handleInputChange}></input>
+                    <h3 class="h3 mb-3 font-weight-normal">COME JOIN THE PARTY!</h3>
+                    <div className="form-signin">
+                        <label for="inputEmail" class="sr-only">Email address</label>
+                        <input className="form-control" type="email" name="email" placeholder="email address" onChange={handleInputChange} required autofocus></input>
+                        <label for="loginName" class="sr-only">Name</label>
+			            <input type="text" id="loginName" name="name" className="form-control" placeholder="Name" onChange={handleInputChange} required></input>
                     </div>
                     <div>
-                        <button className="btn btn-outline-primary px-4 m-4" onClick={submitLogin}>Login with email</button>
+                        <button className="btn btn-outline-primary px-4 m-4" onClick={submitLogin}>JOIN THE PARTY!</button>
                     </div>
                 </div>
             ) : (
