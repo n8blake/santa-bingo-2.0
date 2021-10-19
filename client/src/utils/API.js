@@ -2,11 +2,19 @@
 import axios from "axios";
 
 export default {
-    login: function(email){
+    login: function(email, name){
         console.log("Loging in with: " + email);
         const loginURL = '/api/login/';
-        const payload = {email}
+        const payload = {
+            email: email,
+            name: name
+        }
         return axios.post(loginURL, payload);
+    },
+    logout: function(){
+        console.log("Logging out...");
+        const logoutURL = '/api/logout/';
+        return axios.get(logoutURL);
     },
     validateToken: function(token){
         console.log("validating token...");
@@ -18,5 +26,26 @@ export default {
         console.log("Checking login status");
         const loginURL = '/api/login/';
         return axios.get(loginURL);
+    },
+    getProfileData: function(token){
+        console.log(token);
+        const profileDataURL = '/api/users/me/';
+        return axios.get(profileDataURL);
+    },
+    updateProfileData: function(profile){
+        console.log(profile);
+        const profileDataURL = '/api/users/me/';
+        return axios.post(profileDataURL, profile);
+    },
+    createProfileData: function(profile){
+        console.log(profile);
+        const profileDataURL = '/api/users/me/';
+        return axios.put(profileDataURL, profile);
+    },
+    getCards: function(playerID){
+        console.log(playerID);
+        const cardsURL = '/api/cards/player/'
+        const data = {id: playerID}
+        return axios.post(cardsURL, data);
     }
 };
