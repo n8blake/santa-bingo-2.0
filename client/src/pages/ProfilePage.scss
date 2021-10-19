@@ -10,6 +10,61 @@
     color: $secondary;
 }
 
+.profile-badge {
+    width: 128pt;
+    height: 125pt;
+    border-radius: 25rem;
+    text-align: center;
+    font-family: bely-display;
+    margin: auto;
+    margin-top: 20pt;
+}
+
+.profile-badge-letters {
+    position: relative;
+    top: 12.5%;
+    font-size: 64pt;
+    max-width: 110pt;
+}
+
+.color-picker-wrapper {
+    margin: auto;
+}
+
+.color-picker {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.profile-color-choice {
+    width: 48pt;
+    height: 48pt;
+    border-radius: 10rem;
+    margin: 10pt;   
+}
+
+.profile-color-choice-selected {
+    border: solid white 2pt;
+}
+
+.profile-color-red {
+    background-color: $secondary;
+}
+
+.profile-color-green {
+    background-color: $green;
+}
+
+.profile-color-yellow {
+    background-color: $yellow;
+}
+
+.profile-color-blue {
+    background-color: $blue;
+}
+
+
 input {
     background-color: #00000000;
     color: white;
@@ -38,4 +93,15 @@ input:focus {
 .input-glyph {
     margin: 0pt 10pt;
     font-size: 16pt;
+}
+
+.submit-changes-btn {
+    margin-top: 20pt;
+    margin-bottom: 20pt;
+}
+
+#new-profile-helper {
+    text-align: center;
+    align-content: center;
+    margin-bottom: 20pt;
 }
