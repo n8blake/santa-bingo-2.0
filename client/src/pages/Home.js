@@ -10,14 +10,7 @@ function Home(){
 
     return(
         <div className="container">
-            {
-                !state.validToken ? (
-                    <Redirect to="/login" />
-                ) : (
-                    <Card />
-                )
-            }
-            
+            <Card />
         </div>
     )
 
