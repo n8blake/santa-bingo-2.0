@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, useContext } from "react";
 // import actions 
-import { LOGIN, LOADING, SET_TOKEN, VALIDATE_TOKEN, SET_EMAIL } from "./actions";
+import { LOGIN, LOADING, SET_TOKEN, VALIDATE_TOKEN, SET_EMAIL, SET_DISPLAY_NAME, SET_FIRST_NAME, SET_LAST_NAME, SET_USER_ID, SET_COLOR, SET_CARDS } from "./actions";
 
 const StoreContext = createContext();
 const { Provider } = StoreContext;
@@ -28,6 +28,36 @@ const reducer = (state, action) => {
                 ...state,
                 email: action.email
             }
+        case SET_DISPLAY_NAME:
+            return {
+                ...state,
+                displayName: action.displayName
+            }
+        case SET_FIRST_NAME:
+            return {
+                ...state,
+                firstName: action.firstName
+            }
+        case SET_LAST_NAME:
+            return {
+                ...state,
+                lastName: action.lastName
+        }
+        case SET_USER_ID:
+            return {
+                ...state,
+                userID: action.userID
+        }
+        case SET_COLOR:
+            return {
+                ...state,
+                color: action.color
+            }
+        case SET_CARDS:
+            return {
+                ...state,
+                cards: action.cards
+            }
         case LOADING: 
             return {
                 ...state,
@@ -43,8 +73,13 @@ const StoreProvider = ({value = [], ...props}) => {
         loggedIn: false,
         token:"",
         validToken:false,
-        userName:"",
+        firstName:"",
+        lastName:"",
+        displayName:"",
         email: "",
+        userID: "",
+        color: "",
+        cards: [],
         loading: false
     });
 
