@@ -12,7 +12,9 @@
 }
 
 .pageLinkBtn {
-	margin-top: 8pt;
+	position: absolute;
+	top: 20pt;
+	right: 30pt;
 	font-size: 18pt;
 	opacity: .25;
 	transition: opacity .25s;
@@ -49,6 +51,13 @@
 	margin-top: -12pt;
 	margin-bottom: 0;
 	padding: 0pt;
+}
+
+.logoHero {
+	max-width:40%;
+	max-height:40%;
+	width: 300px;
+	height: 75px;
 }
 
 @media only screen and (max-width: 375px) {
