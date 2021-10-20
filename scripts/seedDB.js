@@ -55,7 +55,7 @@ User
 User.find({}).then(users => {
     // Make cards for each user
     users.map((user) => {
-        const id = user._id;
+        const id = user.email;
         //console.log(id);
         for(let i = 0; i < 4; i++){
             const card = {
@@ -71,7 +71,7 @@ User.find({}).then(users => {
                 do {
                     num = getRandomInt(1, 15);
                     //console.log(num);
-                } while(card.column_0.indexOf(num) > 0)
+                } while(card.column_0.indexOf(num) > -1)
                 card.column_0.push(num);
             }
 
@@ -82,7 +82,7 @@ User.find({}).then(users => {
                 let num;
                 do {
                     num = getRandomInt(16, 30) 
-                } while(card.column_1.indexOf(num) > 0)
+                } while(card.column_1.indexOf(num) > -1)
                 card.column_1.push(num);
             }
 
@@ -94,7 +94,7 @@ User.find({}).then(users => {
                 do {
                     num = getRandomInt(31, 45); 
                     //console.log(num);
-                } while(card.column_2.indexOf(num) > 0)
+                } while(card.column_2.indexOf(num) > -1)
                 card.column_2.push(num);
                 // Set index 2 to zero on every card for Col 2
                 if(j === 2){
@@ -109,7 +109,7 @@ User.find({}).then(users => {
                 let num;
                 do {
                     num = getRandomInt(46, 60); 
-                } while(card.column_3.indexOf(num) > 0)
+                } while(card.column_3.indexOf(num) > -1)
                 card.column_3.push(num);
             }
 
@@ -120,7 +120,7 @@ User.find({}).then(users => {
                 let num;
                 do {
                     num = getRandomInt(61, 75); 
-                } while(card.column_4.indexOf(num) > 0)
+                } while(card.column_4.indexOf(num) > -1)
                 card.column_4.push(num);
             }
             //console.log(card);
