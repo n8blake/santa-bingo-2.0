@@ -9,6 +9,8 @@ const CardSchema = new Schema({
     column_2: { type: Array, required: true },
     column_3: { type: Array, required: true },
     column_4: { type: Array, required: true },
+    created: { type: Date, required: true, default: new Date() },
+    active: { type: Boolean, require: true, default: true }
 });
 
 const Card = Model("Card", CardSchema);

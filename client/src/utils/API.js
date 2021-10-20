@@ -2,36 +2,50 @@
 import axios from "axios";
 
 export default {
-    // Get all employees
-    search: function(queryString){
-        const searchURL = 'https://www.googleapis.com/books/v1/volumes?q=' + queryString;
-        //console.log(`Getting ${queryString}`)
-        return axios.get(searchURL);
-    },
-    // Get books from our own api
-    getBooks: function(bookObj){
-        let getBooksURL = '/api/books/';
-        if(bookObj){
-            // modify url to get book url
+    login: function(email, name){
+        console.log("Loging in with: " + email);
+        const loginURL = '/api/login/';
+        const payload = {
+            email: email,
+            name: name
         }
-        return axios.get(getBooksURL);
+        return axios.post(loginURL, payload);
     },
-    // post a new favorite
-    postFavorite: function(bookObj){
-        console.log("posting");
-        const booksURL = '/api/books/';
-        return axios.post(booksURL, bookObj);
+    logout: function(){
+        console.log("Logging out...");
+        const logoutURL = '/api/logout/';
+        return axios.get(logoutURL);
     },
-    // remove a favorite
-    removeFavorite: function(id){
-        console.log("Removing");
-        const bookURL = '/api/books/' + id;
-        return axios.delete(bookURL);
+    validateToken: function(token){
+        console.log("validating token...");
+        const validateTokenURL = '/api/login/validate';
+        const payload = {token}
+        return axios.post(validateTokenURL, payload);
     },
-    // get a color for a book
-    getBookColor: function(url){
-        const requestBody = {url: url}
-        const colorURL = '/api/color/';
-        return axios.post(colorURL, requestBody);
+    checkLoginStatus: function(){
+        console.log("Checking login status");
+        const loginURL = '/api/login/';
+        return axios.get(loginURL);
+    },
+    getProfileData: function(token){
+        console.log(token);
+        const profileDataURL = '/api/users/me/';
+        return axios.get(profileDataURL);
+    },
+    updateProfileData: function(profile){
+        console.log(profile);
+        const profileDataURL = '/api/users/me/';
+        return axios.post(profileDataURL, profile);
+    },
+    createProfileData: function(profile){
+        console.log(profile);
+        const profileDataURL = '/api/users/me/';
+        return axios.put(profileDataURL, profile);
+    },
+    getCards: function(playerID){
+        console.log(playerID);
+        const cardsURL = '/api/cards/player/'
+        const data = {id: playerID}
+        return axios.post(cardsURL, data);
     }
 };

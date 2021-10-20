@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, useContext } from "react";
 // import actions 
-import { SET_VIEW_MODE, UPDATE_BOOKS, SEARCH, UPDATE_SEARCH_RESULTS, LOADING, SET_ACTIVE_BOOK } from "./actions";
+import { LOGIN, LOADING, SET_TOKEN, VALIDATE_TOKEN, SET_EMAIL, SET_DISPLAY_NAME, SET_FIRST_NAME, SET_LAST_NAME, SET_USER_ID, SET_COLOR, SET_CARDS } from "./actions";
 
 const StoreContext = createContext();
 const { Provider } = StoreContext;
@@ -8,32 +8,55 @@ const { Provider } = StoreContext;
 const reducer = (state, action) => {
     // switch on action type
     switch(action.type){
-        case SET_VIEW_MODE:
+        case LOGIN: 
             return {
                 ...state,
-                viewMode: action.viewMode,
-                loading: false
+                loggedIn: action.login,
             }
-        case UPDATE_BOOKS:
+        case SET_TOKEN:
             return {
                 ...state,
-                books: [...action.books],
-                loading: false
+                token: action.token
             }
-        case SEARCH:
+        case VALIDATE_TOKEN: 
             return {
                 ...state,
-                searchTerm: action.searchTerm
+                validToken: action.isValid
             }
-        case UPDATE_SEARCH_RESULTS:
+        case SET_EMAIL:
             return {
                 ...state,
-                searchResults: {...action.searchResults}
+                email: action.email
             }
-        case SET_ACTIVE_BOOK:
+        case SET_DISPLAY_NAME:
             return {
                 ...state,
-                activeBook: action.activeBook
+                displayName: action.displayName
+            }
+        case SET_FIRST_NAME:
+            return {
+                ...state,
+                firstName: action.firstName
+            }
+        case SET_LAST_NAME:
+            return {
+                ...state,
+                lastName: action.lastName
+        }
+        case SET_USER_ID:
+            return {
+                ...state,
+                userID: action.userID
+        }
+        case SET_COLOR:
+            return {
+                ...state,
+                color: action.color
+            }
+        case SET_CARDS:
+            return {
+                ...state,
+                cards: action.cards
             }
         case LOADING: 
             return {
@@ -47,10 +70,16 @@ const reducer = (state, action) => {
 
 const StoreProvider = ({value = [], ...props}) => {
     const [state, dispatch] = useReducer(reducer, {
-        books: [],
-        activeBook: {},
-        searchTerm: "",
-        searchResults: [],
+        loggedIn: false,
+        token:"",
+        validToken:false,
+        firstName:"",
+        lastName:"",
+        displayName:"",
+        email: "",
+        userID: "",
+        color: "",
+        cards: [],
         loading: false
     });
 
