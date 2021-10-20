@@ -1,44 +1,43 @@
 import React, { useEffect } from 'react';
-import { useStoreContext } from '../../utils/GlobalState';
-import API from '../../utils/API';
-import { SET_CARDS } from '../../utils/actions';
-
+// import { useStoreContext } from '../../utils/GlobalState';
+// import API from '../../utils/API';
+// import { SET_CARDS } from '../../utils/actions';
+//import zero from '../../assets/SVG/0.svg';
 import './Card.scss'
-
+import Icon from '../Icon/Icon';
 
 function Card(props) {
 
-    const [state, dispatch] = useStoreContext();
+    //const [state, dispatch] = useStoreContext();
 
-    const letters = ['S', 'a', 'n', 't', 'A'];
-    const tableHead = letters.map((letter) => 
+    const tableHead = props.title.map((letter) => 
         <th className="bingoCardHeader">{letter}</th>
     );
 
-    const cards = state.cards.map((card) => {
-        <tr>{card}</tr>
+    const rows = [0, 1, 2, 3, 4];
+    const cells = rows.map((row) => {
+        return (<tr className="bingoCardRow">
+            <td class="bingoCell">
+                <img src={`/images/santa/${props.cells.column_0[row]}.svg`} alt="" />
+            </td>
+            <td class="bingoCell">
+            <img src={`/images/santa/${props.cells.column_1[row]}.svg`} alt="" />
+            </td>
+            <td class="bingoCell">
+            <img src={`/images/santa/${props.cells.column_2[row]}.svg`} alt="" />
+            </td>
+            <td class="bingoCell">
+            <img src={`/images/santa/${props.cells.column_3[row]}.svg`} alt="" />
+            </td>
+            <td class="bingoCell">
+            <img src={`/images/santa/${props.cells.column_4[row]}.svg`} alt="" />
+            </td>
+        </tr>)
     });
 
-    useEffect(() => {
-        if(state.cards.length === 0 && state.userID !== ''){
-            const playerID = state.userID;
-            API.getCards(playerID).then(response => {
-                console.log(response);
-                if(response.data){
-                    dispatch({
-                        type: SET_CARDS,
-                        cards: response.data
-                    })
-                } else {
-                    console.log(response);
-                    throw new Error("No cards returned");
-                }
-            }) 
-            .catch(error => {
-                console.log(error);
-            })
-        }
-    }, [state.cards.length, state.userID]);
+    // useEffect(() => {
+
+    // }, []);
 
     // <tr className="bingoCardRow" ng-repeat="row in rows">
 	// 			<td class="bingoCell" ng-class="{'called':(game.calledNumbers.indexOf(activeCard.card[column][row]) > -1), 'marked':(marks.indexOf(activeCard.card[column][row]) > -1)}" ng-repeat="column in columns" ng-click="mark(activeCard.card[column][row])">
@@ -47,23 +46,17 @@ function Card(props) {
 	// 		</tr>
 
     return(
-        <div>
-        <table className="bingoCard">
-		<thead>
-			<tr >
-				{tableHead}
-			</tr>
-		</thead>
-		<tbody>	
-			{ state.cards.length > 0 ? (
-                state.cards.map((card) => 
-                    <tr key={card}>a {card}</tr>)
-            ) : (
-                <tr>no card</tr>
-            )}
-		</tbody>
-	    </table>
-        <span>tabel</span>
+        <div className="bingoCardContainer">
+            <table className="bingoCard">
+                <thead>
+                    <tr >
+                        {tableHead}
+                    </tr>
+                </thead>
+                <tbody>	
+                    {cells}
+                </tbody>
+            </table>
         </div>
     )
 }
