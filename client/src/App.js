@@ -7,8 +7,8 @@ import Home from './pages/Home';
 import Header from './components/Header';
 import ProfilePage from "./pages/ProfilePage";
 import NoMatch from "./pages/NoMatch";
+import NewGamePage from "./pages/NewGame";
 import './App.scss';
-
 
 function App() {
   return (
@@ -22,6 +22,7 @@ function App() {
           <PrivateRoute>
             <Route exact path={"/"} children={<Home />} />
             <Route exact path={"/profile"} children={<ProfilePage />}/>
+            <Route exact path={"/game/new"} children={<NewGamePage />}/>
           </PrivateRoute>
           <Route>
             <NoMatch />
