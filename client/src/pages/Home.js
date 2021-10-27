@@ -17,9 +17,36 @@ function Home(){
         column_4: [72, 71, 69, 65, 63],
     }
 
+    const gameNames = ["Blake Family", "Roberts Family", "Jaren Blake Family"];
+
+    const gameListItems = gameNames.map(game => {
+        return(<li className="list-group-item">
+            <div className="d-flex justify-content-between">
+                <span className="m-2">{game}</span>
+                <button className="btn bnt-sm btn-outline-light">JOIN</button>
+            </div>
+        </li>)
+    })
+
     return(
         <div className="container">
-            <Card title={cardTitle} cells={cells} />
+            <div className="d-flex justify-content-center">
+                <span>JOIN A GAME ROOM</span>
+            </div>
+            <div className="list-group-flush">
+                {gameListItems}
+            </div>
+            <div className="d-flex justify-content-center">
+                <div className="m-4">OR</div>
+            </div>
+            <div className="d-flex justify-content-center">
+                
+                <button className="btn btn-outline-light">CREATE NEW GAME</button>
+            </div>
+            <hr></hr>
+            <div>
+                cards...
+            </div>
         </div>
     )
 
