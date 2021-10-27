@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { useStoreContext } from "../../utils/GlobalState";
+//import { useStoreContext } from "../../utils/GlobalState";
 import HeaderRed from '../../assets/SVG/SB_logo_red.svg';
 import HeaderGreen from '../../assets/SVG/SB_logo_green.svg';
 
@@ -8,7 +8,7 @@ import './style.scss';
 
 function Header() {
 	const location = useLocation();
-	const [state, dispatch] = useStoreContext();
+	//const [state, dispatch] = useStoreContext();
 	const [inGame, setInGame] = useState(false);
 
 	return(

@@ -47,5 +47,20 @@ export default {
         const cardsURL = '/api/cards/player/'
         const data = {id: playerID}
         return axios.post(cardsURL, data);
+    },
+    getGames: function(){
+        const gamesURL = '/api/game/list/'
+        return axios.get(gamesURL);
+    },
+    getGame: function(id){
+        const gameURL = `/api/game/${id}`;
+        return axios.get(gameURL);
+    },
+    createNewGame: function(name){
+        const game = {
+            gameName: name
+        }
+        const newGameURL = '/api/game/new/';
+        return axios.post(newGameURL, game);
     }
 };

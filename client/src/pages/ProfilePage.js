@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+//import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { useStoreContext } from "../utils/GlobalState";
-import useDebounce from "../utils/debounceHook";
 import './ProfilePage.scss';
 import { SET_DISPLAY_NAME, LOGIN, SET_TOKEN, SET_EMAIL, SET_FIRST_NAME, SET_LAST_NAME, VALIDATE_TOKEN, SET_USER_ID, SET_COLOR } from "../utils/actions";
 import API from "../utils/API";

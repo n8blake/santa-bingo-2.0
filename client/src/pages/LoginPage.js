@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link,
-    useParams,
-    Redirect
-  } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import { useStoreContext } from "../utils/GlobalState";
-import useDebounce from "../utils/debounceHook";
 import { LOGIN, SET_TOKEN, VALIDATE_TOKEN } from "../utils/actions";
 import API from "../utils/API";
 import "./LoginPage.scss";
@@ -17,7 +9,6 @@ function LoginPage(props) {
     const [state, dispatch] = useStoreContext();
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
-    const debouncedEmail = useDebounce(email, 500);
 
     const handleInputChange = event => {
         if(event.target.name === 'email') {
