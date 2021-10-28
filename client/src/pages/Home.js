@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-//import { useStoreContext } from "../utils/GlobalState";
+import { useStoreContext } from "../utils/GlobalState";
 import API from "../utils/API";
 //import Card from '../components/Card/Card';
 import './Home.scss';
+import { SET_IN_GAME } from "../utils/actions";
+
 
 function Home(){
     
- //   const [state, dispatch] = useStoreContext();
+    const [state, dispatch] = useStoreContext();
     const [gameNames, setGameNames] = useState([]);
-/*    
-*/
 
     //const gameNames = ["Blake Family", "Roberts Family", "Jaren Blake Family"];
     useEffect(() => {
+        dispatch({
+            type: SET_IN_GAME,
+            inGame: false
+        });
+        const metaThemeColor = document.querySelector("meta[name=theme-color]");
+        metaThemeColor.setAttribute("content", "#150300");
         API.getGames().then(games => {
             console.log(games);
             setGameNames(games.data);
@@ -32,6 +38,7 @@ function Home(){
 
     return(
         <div className="container">
+            <div className="game-bg bg-grad-red"></div>
             <div className="d-flex justify-content-center">
                 <span>GAMES</span>
             </div>

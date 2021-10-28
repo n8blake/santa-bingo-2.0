@@ -12,5 +12,5 @@ router.route('/list/')
 // Matches with '/api/game/:id'
 router.route('/:id')
     .get(gameController.find)
-
+    .post(gameController.update)
 module.exports = router;

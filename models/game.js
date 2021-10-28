@@ -6,6 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const GameSchema = new Schema({
     start_time: { type: Date },
     end_time: { type: Date },
+    inGame: { type: Boolean, required: true, default: false},
     numbers: { type: Array },
     uuid: { type: String, required: true, default: uuidv4 },
     creator: { type: String },

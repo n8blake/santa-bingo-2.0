@@ -58,11 +58,49 @@ module.exports = {
                 })
                 .catch(error => response.status(422).json(error))
         }
+    },
+    // update the game
+    update: function(request, response){
+        if(!request.session.token) response.status(401).send();
+        Game.findOne({uuid: request.params.id})
+            .then(game => {
+                console.log("game found. Updating");
+                console.log(game);
+                console.log(request.session.user.uuid);
+                if(game.creator === request.session.user.uuid){
+                    // start
+                    if(request.body.start){
+                        console.log("starting game");
+                        game.start_time = new Date();
+                        game.inGame = true;
+                        Game.updateOne({uuid: game.uuid}, game)
+                            .then(result => {
+                                response.json(result);
+                            })
+                            .catch(error => response.status(422).json(error));
+                    }
+                    // end game
+                    if(request.body.end){
+                        game.end_time = new Date();
+                        game.inGame = false;
+                        Game.updateOne({uuid: game.uuid}, game)
+                            .then(result => {
+                                response.json(result);
+                            })
+                            .catch(error => response.status(422).json(error));
+                    }
+                    // call a number
+                    // change game type ? 
+                }
+                // check numbers agains card for win
+            })
+            .catch(error => {
+                response.status(422).json(error);
+            })
+        
+        
+        
     }
-    // start game
-    // end game
-    // call a number
-    // change game type ? 
-    // check numbers agains card for win
+        
     // 
 }

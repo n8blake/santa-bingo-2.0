@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Redirect } from "react-router-dom";
 import { useStoreContext } from "../utils/GlobalState";
-import { LOGIN, SET_TOKEN, VALIDATE_TOKEN } from "../utils/actions";
+import { LOGIN, SET_TOKEN, VALIDATE_TOKEN, SET_IN_GAME } from "../utils/actions";
 import API from "../utils/API";
 import "./LoginPage.scss";
 
@@ -87,7 +87,12 @@ function LoginPage(props) {
     }
 
     useEffect(() => {
-       // do something ?
+        dispatch({
+            type: SET_IN_GAME,
+            inGame: false
+        });
+        const metaThemeColor = document.querySelector("meta[name=theme-color]");
+        metaThemeColor.setAttribute("content", "#150300");
         if(!state.loggedIn){
             API.checkLoginStatus().then(result => {
                 console.log(result);
@@ -110,6 +115,7 @@ function LoginPage(props) {
 
     return (
         <div className="container">
+            <div className="game-bg bg-grad-red"></div>
             {!state.validToken ? (
                 <div className="login-form">
                     <h3 class="h3 mb-3 font-weight-normal">COME JOIN THE PARTY!</h3>

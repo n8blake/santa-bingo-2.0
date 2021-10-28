@@ -1,5 +1,4 @@
-export const SET_VIEW_MODE = "SET_VIEW_MODE";
-export const LOADING = "LOADING";
+export const SET_IN_GAME = "SET_IN_GAME";
 export const LOGIN = "LOGIN";
 export const SET_TOKEN = "SET_TOKEN";
 export const VALIDATE_TOKEN = "VALIDATE_TOKEN";
@@ -10,3 +9,4 @@ export const SET_LAST_NAME = "SET_LAST_NAME";
 export const SET_USER_ID = "SET_USER_ID";
 export const SET_COLOR = "SET_COLOR";
 export const SET_CARDS = "SET_CARDS";
+export const SET_USER = "SET_USER";

@@ -62,5 +62,10 @@ export default {
         }
         const newGameURL = '/api/game/new/';
         return axios.post(newGameURL, game);
+    },
+    updateGame: function(id, update){
+        console.log(`Updating game ${id}`);
+        const gameURL = `/api/game/${id}`;
+        return axios.post(gameURL, update);
     }
 };
