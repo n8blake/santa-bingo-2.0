@@ -23,8 +23,13 @@ function App() {
           <PrivateRoute>
             <Route exact path={"/"} children={<Home />} />
             <Route exact path={"/profile"} children={<ProfilePage />}/>
-            <Route exact path={"/game/new"} children={<NewGamePage />}/>
-            <Route path={"/game/:uuid"} children={<GamePage />}/>
+            
+            <Route exact path={`/game/:uuid`} >
+                <GamePage />
+            </Route> 
+            
+            
+            
           </PrivateRoute>
           <Route>
             <NoMatch />
