@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { StoreProvider } from './utils/GlobalState';
+import { socket, SocketContext } from './utils/socket';
 import PrivateRoute from './utils/privateRoute';
 import LoginPage from './pages/LoginPage';
 import Home from './pages/Home';
@@ -13,6 +14,7 @@ import './App.scss';
 
 function App() {
   return (
+    <SocketContext.Provider value={socket}>
     <StoreProvider>
       <Router>
         <Header />
@@ -37,6 +39,7 @@ function App() {
         </Switch>
       </Router>
     </StoreProvider>
+    </SocketContext.Provider>
   );
 }
 

@@ -3,14 +3,19 @@ const express = require("express");
 const session = require('express-session');
 const compression = require('compression');
 const path = require("path");
+//const { Server } = require("socket.io");
 
 const mongoose = require("mongoose");
 const routes = require("./routes");
 const cors = require("cors");
+//const { createServer } = require('http');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 const PORT = process.env.PORT || 3001;
 const app = express();
+
+const server = require("http").createServer(app);
+const io = require('socket.io')(server);
 
 // Define Session Store
 const store = new MongoDBStore({
@@ -30,7 +35,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Use session
-app.use(session({
+const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
@@ -38,21 +43,68 @@ app.use(session({
   store: store,
   resave: true,
   saveUninitialized: true
-}));
+});
+app.use(sessionMiddleware);
 
 // Serve up static assets (usually on heroku)
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
 }
 
-// Add routes, both API and view
-app.use(routes);
+
 
 // Connect to the Mongo DB
 mongoose.connect(
   process.env.MONGODB_URI || "mongodb://localhost/santa-bingo-n8blake"
 );
 
-app.listen(PORT, () => {
-  console.log(`🌎 ==> API server now on port ${PORT}!`);
+
+io.use((socket, next) => {
+  sessionMiddleware(socket.request, {}, next);
 });
+
+io.on('connection', (socket) => {
+  const session = socket.request.session;
+  session.connections++;
+  session.save();
+  console.log('client connect');
+  socket.on('join', function (room) {
+      console.log(room);
+      if(room){
+          console.log(`Adding to ${room}`);
+          socket.join(room);
+          socket.emit('joined', room);
+      }
+  });
+  socket.on('start', function (room) {
+      console.log(`Starting game ${room}`);
+      if(room){
+          //console.log('starting');
+          socket.to(room).emit('started', 'game started');
+      }
+  });
+  socket.on('end', function (room) {
+      console.log(`Ending game ${room}`);
+      if(room){
+          //console.log('ending');
+          socket.to(room).emit('ended', 'game ended');
+
+      }
+  });
+});
+
+// Make io accessible to our router
+app.use(function(request, response, next){
+  request.io = io;
+  next();
+});
+
+// Add routes, both API and view
+app.use(routes);
+
+server.listen(PORT, () => {
+  console.log(`🌎 ==> API server now on port ${PORT}!`);
+})
+// app.listen(PORT, () => {
+//   console.log(`🌎 ==> API server now on port ${PORT}!`);
+// });

@@ -14,7 +14,7 @@ function Header() {
 	return(
 		<div className="header">
 			<div className="jumbotron">
-				<Link to="/" style={{ textDecoration: 'none' }}>
+				<Link to={'/'} style={{ textDecoration: 'none' }}>
 					{ state.inGame ? (
 						<img className="logoHero" src={HeaderGreen} alt="Santa Bingo"/>
 					) : (

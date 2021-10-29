@@ -64,9 +64,6 @@ module.exports = {
         if(!request.session.token) response.status(401).send();
         Game.findOne({uuid: request.params.id})
             .then(game => {
-                console.log("game found. Updating");
-                console.log(game);
-                console.log(request.session.user.uuid);
                 if(game.creator === request.session.user.uuid){
                     // start
                     if(request.body.start){

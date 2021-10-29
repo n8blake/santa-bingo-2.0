@@ -1,7 +1,7 @@
 {
-  "name": "client",
-  "version": "0.1.0",
-  "description": "Project Latinum Frontend",
+  "name": "santa-bingo-client",
+  "version": "2.0.0",
+  "description": "Santa Bingo Frontend",
   "proxy": "http://localhost:3001/",
   "private": true,
   "dependencies": {
@@ -18,6 +18,7 @@
     "react-scripts": "4.0.3",
     "sass": "^1.35.1",
     "sass-loader": "^10.1.1",
+    "socket.io-client": "^4.3.2",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
