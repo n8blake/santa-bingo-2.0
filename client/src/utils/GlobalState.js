@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, useContext } from "react";
 // import actions 
-import { LOGIN, LOADING, SET_TOKEN, VALIDATE_TOKEN, SET_EMAIL, SET_DISPLAY_NAME, SET_FIRST_NAME, SET_LAST_NAME, SET_USER_ID, SET_COLOR, SET_CARDS } from "./actions";
+import { LOGIN, SET_TOKEN, VALIDATE_TOKEN, SET_EMAIL, SET_DISPLAY_NAME, SET_FIRST_NAME, SET_LAST_NAME, SET_USER_ID, SET_COLOR, SET_CARDS, SET_USER, SET_IN_GAME } from "./actions";
 
 const StoreContext = createContext();
 const { Provider } = StoreContext;
@@ -53,15 +53,22 @@ const reducer = (state, action) => {
                 ...state,
                 color: action.color
             }
-        case SET_CARDS:
-            return {
-                ...state,
-                cards: action.cards
+        case SET_IN_GAME:
+            if(action.inGame){
+                const metaThemeColor = document.querySelector("meta[name=theme-color]");
+                metaThemeColor.setAttribute("content", "#001704");
+            } else {
+                const metaThemeColor = document.querySelector("meta[name=theme-color]");
+                metaThemeColor.setAttribute("content", "#150300");
             }
-        case LOADING: 
             return {
                 ...state,
-                loading: true
+                inGame: action.inGame
+            }
+        case SET_USER:
+            return {
+                ...state,
+                user: action.user
             }
         default: 
             return state;
@@ -73,14 +80,14 @@ const StoreProvider = ({value = [], ...props}) => {
         loggedIn: false,
         token:"",
         validToken:false,
+        user: {},
         firstName:"",
         lastName:"",
         displayName:"",
         email: "",
         userID: "",
         color: "",
-        cards: [],
-        loading: false
+        inGame: false
     });
 
     return <Provider value={[state, dispatch]} {...props} />;

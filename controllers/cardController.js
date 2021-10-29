@@ -6,7 +6,7 @@ module.exports = {
         if(!request.session.user) response.status(401).send()
         //if(!request.body.id) response.status(400).send();
         Card
-            .find({player: request.session.user.email}).then(cards => {
+            .find({player: request.session.user.uuid}).then(cards => {
                 console.log(cards);
                 response.json(cards);
             })

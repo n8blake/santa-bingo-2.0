@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+//import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { useStoreContext } from "../utils/GlobalState";
-import useDebounce from "../utils/debounceHook";
 import './ProfilePage.scss';
-import { SET_DISPLAY_NAME, LOGIN, SET_TOKEN, SET_EMAIL, SET_FIRST_NAME, SET_LAST_NAME, VALIDATE_TOKEN, SET_USER_ID, SET_COLOR } from "../utils/actions";
+import { SET_DISPLAY_NAME, LOGIN, SET_TOKEN, SET_EMAIL, SET_FIRST_NAME, SET_LAST_NAME, VALIDATE_TOKEN, SET_USER_ID, SET_COLOR, SET_IN_GAME } from "../utils/actions";
 import API from "../utils/API";
 
 function ProfilePage(props){
@@ -122,6 +121,13 @@ function ProfilePage(props){
     }
 
     useEffect(() => {
+        dispatch({
+            type: SET_IN_GAME,
+            inGame: false
+        });
+        const metaThemeColor = document.querySelector("meta[name=theme-color]");
+        metaThemeColor.setAttribute("content", "#150300");
+
         const token = state.token;
         console.log("fetching profile data");
         if((!state.firstName || !state.lastName || !state.displayName) && !editing){
@@ -180,6 +186,7 @@ function ProfilePage(props){
 
     return(
         <div className="container">
+            <div className="game-bg bg-grad-red"></div>
             <div className="input-wrapper title">Edit Profile</div>
             
             <div className={`profile-color-${state.color} profile-badge`}>

@@ -9,13 +9,13 @@ import './style.scss';
 function Header() {
 	const location = useLocation();
 	const [state, dispatch] = useStoreContext();
-	const [inGame, setInGame] = useState(false);
+	//const [inGame, setInGame] = useState(false);
 
 	return(
 		<div className="header">
 			<div className="jumbotron">
-				<Link to="/" style={{ textDecoration: 'none' }}>
-					{ inGame ? (
+				<Link to={'/'} style={{ textDecoration: 'none' }}>
+					{ state.inGame ? (
 						<img className="logoHero" src={HeaderGreen} alt="Santa Bingo"/>
 					) : (
 						<img className="logoHero" src={HeaderRed} alt="Santa Bingo"/>

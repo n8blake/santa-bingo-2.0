@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route, Switch, Redirect, render } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 import { useStoreContext } from './GlobalState';
 import API from '../utils/API';
-import { LOGIN, SET_TOKEN, VALIDATE_TOKEN, SET_FIRST_NAME, SET_LAST_NAME, SET_DISPLAY_NAME, SET_EMAIL, SET_USER_ID, SET_COLOR } from "../utils/actions";
+import { LOGIN, SET_TOKEN, VALIDATE_TOKEN, SET_FIRST_NAME, SET_LAST_NAME, SET_DISPLAY_NAME, SET_EMAIL, SET_USER_ID, SET_COLOR, SET_USER } from "../utils/actions";
 
 // A wrapper for <Route> that redirects to the login
 // screen if you're not yet authenticated.
@@ -39,6 +39,10 @@ function PrivateRoute({ children, ...rest }) {
                 }
 
                 if(result.data.user){
+                  dispatch({
+                    type: SET_USER,
+                    user: result.data.user
+                  })
                   dispatch({
                     type: SET_FIRST_NAME,
                     firstName: result.data.user.firstName

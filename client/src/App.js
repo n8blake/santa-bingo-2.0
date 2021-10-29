@@ -1,17 +1,20 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { StoreProvider, useStoreContext } from './utils/GlobalState';
+import { StoreProvider } from './utils/GlobalState';
+import { socket, SocketContext } from './utils/socket';
 import PrivateRoute from './utils/privateRoute';
 import LoginPage from './pages/LoginPage';
 import Home from './pages/Home';
 import Header from './components/Header';
 import ProfilePage from "./pages/ProfilePage";
 import NoMatch from "./pages/NoMatch";
+import NewGamePage from "./pages/NewGame";
+import GamePage from "./pages/GamePage";
 import './App.scss';
-
 
 function App() {
   return (
+    <SocketContext.Provider value={socket}>
     <StoreProvider>
       <Router>
         <Header />
@@ -22,6 +25,13 @@ function App() {
           <PrivateRoute>
             <Route exact path={"/"} children={<Home />} />
             <Route exact path={"/profile"} children={<ProfilePage />}/>
+            
+            <Route exact path={`/game/:uuid`} >
+                <GamePage />
+            </Route> 
+            
+            
+            
           </PrivateRoute>
           <Route>
             <NoMatch />
@@ -29,6 +39,7 @@ function App() {
         </Switch>
       </Router>
     </StoreProvider>
+    </SocketContext.Provider>
   );
 }
 

@@ -1,25 +1,59 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useStoreContext } from "../utils/GlobalState";
-import Card from '../components/Card/Card';
+import API from "../utils/API";
+//import Card from '../components/Card/Card';
 import './Home.scss';
+import { SET_IN_GAME } from "../utils/actions";
+
 
 function Home(){
     
     const [state, dispatch] = useStoreContext();
+    const [gameNames, setGameNames] = useState([]);
 
-    const cardTitle = ['S', 'a', 'n', 't', 'A'];
-    const cells = {
-        column_0: [2, 1, 9, 11, 3],
-        column_1: [16, 17, 29, 21, 30],
-        column_2: [42, 41, 0, 31, 32],
-        column_3: [52, 51, 49, 48, 53],
-        column_4: [72, 71, 69, 65, 63],
-    }
+    //const gameNames = ["Blake Family", "Roberts Family", "Jaren Blake Family"];
+    useEffect(() => {
+        dispatch({
+            type: SET_IN_GAME,
+            inGame: false
+        });
+        const metaThemeColor = document.querySelector("meta[name=theme-color]");
+        metaThemeColor.setAttribute("content", "#150300");
+        API.getGames().then(games => {
+            console.log(games);
+            setGameNames(games.data);
+        })
+        .catch(error => console.log(error));
+    }, [])
+
+    const gameListItems = gameNames.map(game => {
+        return(<li className="list-group-item" key={game.uuid}>
+            <Link to={`/game/${game.uuid}`} className="d-flex justify-content-between gameName">
+                <span className="m-2 gameName">{game.name} </span>
+                <span to={""} className="text-light"><i className="bi bi-caret-right-fill"></i></span>
+            </Link>
+        </li>)
+    })
 
     return(
         <div className="container">
-            <Card title={cardTitle} cells={cells} />
+            <div className="game-bg bg-grad-red"></div>
+            <div className="d-flex justify-content-center">
+                <span>GAMES</span>
+            </div>
+            <div className="list-group-flush">
+                {gameListItems}
+            </div>
+            <hr></hr>
+            <div className="d-flex justify-content-center">
+                <div className="m-4">OR</div>
+            </div>
+            <div className="d-flex justify-content-center">
+                
+                <Link to={"/game/new/"} className="btn btn-outline-light">CREATE NEW GAME</Link>
+            </div>
+            
         </div>
     )
 
