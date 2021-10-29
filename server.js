@@ -63,34 +63,16 @@ io.use((socket, next) => {
   sessionMiddleware(socket.request, {}, next);
 });
 
+const registerSocketHandlers = require('./sockets');
+
 io.on('connection', (socket) => {
   const session = socket.request.session;
   session.connections++;
   session.save();
   console.log('client connect');
-  socket.on('join', function (room) {
-      console.log(room);
-      if(room){
-          console.log(`Adding to ${room}`);
-          socket.join(room);
-          socket.emit('joined', room);
-      }
-  });
-  socket.on('start', function (room) {
-      console.log(`Starting game ${room}`);
-      if(room){
-          //console.log('starting');
-          socket.to(room).emit('started', 'game started');
-      }
-  });
-  socket.on('end', function (room) {
-      console.log(`Ending game ${room}`);
-      if(room){
-          //console.log('ending');
-          socket.to(room).emit('ended', 'game ended');
+  // register socket handlers
+  registerSocketHandlers(io, socket);
 
-      }
-  });
 });
 
 // Make io accessible to our router
