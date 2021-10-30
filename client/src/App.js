@@ -10,6 +10,7 @@ import ProfilePage from "./pages/ProfilePage";
 import NoMatch from "./pages/NoMatch";
 import NewGamePage from "./pages/NewGame";
 import GamePage from "./pages/GamePage";
+import CardManagerPage from "./pages/CardManagerPage";
 import './App.scss';
 
 function App() {
@@ -25,7 +26,8 @@ function App() {
           <PrivateRoute>
             <Route exact path={"/"} children={<Home />} />
             <Route exact path={"/profile"} children={<ProfilePage />}/>
-            
+            <Route exact path={"/cards"} children={<CardManagerPage />}/>
+            <Route exact path={"/newgame/"} children={<NewGamePage />}/>
             <Route exact path={`/game/:uuid`} >
                 <GamePage />
             </Route> 
