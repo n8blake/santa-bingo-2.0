@@ -125,7 +125,7 @@ module.exports = {
         return Game.findOne({uuid: gameUUID})
             .then(game => {
                 if(game.creator === userUUID){
-                    // start game
+                    // end game
                     console.log("ending game");
                     game.end_time = new Date();
                     game.inGame = false;
