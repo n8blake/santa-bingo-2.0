@@ -33,6 +33,10 @@ td.bingoCell{
 	border-color: #DDD;
 }
 
+td.bingoCellInteractable {
+	cursor: pointer;
+}
+
 td.bingoCell.called{
 	background-color: #EFFAEE;
 }
@@ -42,10 +46,10 @@ td.bingoCell.called.marked{
 }
 
 
-td.bingoCell:hover{
+td.bingoCellInteractable:hover{
 	background-color: #EEE;
 }
-td.bingoCell.called:hover{
+td.bingoCellInteractable.called:hover{
 	background-color: #ADD9AA;
 	cursor: pointer;
 }

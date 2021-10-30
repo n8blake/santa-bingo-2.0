@@ -19,16 +19,21 @@ module.exports = {
                 .findOne({uuid: request.params.id})
                 .then(game => {
                     // find players
-                    const playerIds = game.players;
-                    User.find({uuid: {$in: playerIds}})
-                    .then(players => {
-                        game.players = players;
-                        response.json(game);
-                    })
-                    .catch(error => {
-                        response.status(422).json(error);
-                    })
-                    //response.json(dbModel);
+                    //console.log(game);
+                    if(game){
+                        const playerIds = game.players;
+                        User.find({uuid: {$in: playerIds}})
+                        .then(players => {
+                            game.players = players;
+                            response.json(game);
+                        })
+                        .catch(error => {
+                            response.status(422).json(error);
+                        })
+                    } else {
+                        response.status(404).send();
+                    }
+                    
                 })
                 .catch(error => {
                     console.log(error);

@@ -20,20 +20,20 @@ function App() {
       <Router>
         <Header />
         <Switch>
-          
           <Route exact path={["/login/:token", "/login"]} children={<LoginPage />} />
-
           <PrivateRoute>
+            <Switch>
             <Route exact path={"/"} children={<Home />} />
             <Route exact path={"/profile"} children={<ProfilePage />}/>
             <Route exact path={"/cards"} children={<CardManagerPage />}/>
-            <Route exact path={"/newgame/"} children={<NewGamePage />}/>
-            <Route exact path={`/game/:uuid`} >
+            <Route exact stict path={`/game/:uuid`} >
                 <GamePage />
             </Route> 
-            
-            
-            
+            <Route exact stict path={"/newgame/"} children={<NewGamePage />}/>
+            <Route>
+              <NoMatch />
+            </Route>
+            </Switch>
           </PrivateRoute>
           <Route>
             <NoMatch />

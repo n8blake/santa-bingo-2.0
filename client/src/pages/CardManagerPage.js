@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { useStoreContext } from "../utils/GlobalState";
 import API from "../utils/API";
 import Card from '../components/Card/Card';
@@ -26,7 +27,7 @@ function CardManagerPage(props){
     })
 
     const handleCardIndexChange = (adv) => {
-        if((adv === 1 && activeCardIndex < cards.length - 1) || (adv === -1 && activeCardIndex > 0)){
+        if((adv >= 1 && activeCardIndex < cards.length - 1) || (adv <= -1 && activeCardIndex > 0)){
             setActiveCardIndex(activeCardIndex + adv);
         }
     }
@@ -127,13 +128,22 @@ function CardManagerPage(props){
                 </span>
                 <div className="activeCardControls">
                     { cards.length > 1 ? (
-                        <button className="btn text-light activeCardControlBtn mx-2" onClick={deactivateCard}><i class="bi bi-trash"></i></button>
+                        <button className="btn text-light activeCardControlBtn mx-2" onClick={deactivateCard}>
+                            <i class="bi bi-trash"></i>
+                        </button>
                     ) : (
                         <span></span>
                     )}
+                    {
+                        cards.length > 0 ? (
+                            <Link to={`/cards/print/${cards[activeCardIndex].uuid}`} className="btn text-light activeCardControlBtn mx-2" >
+                                <i class="bi bi-printer"></i>
+                            </Link>
+                        ) : (
+                            <span></span>
+                        )
+                    }
                     
-                    
-                    <button className="btn text-light activeCardControlBtn mx-2"><i class="bi bi-printer"></i></button>
                 </div>
             </div>
             
