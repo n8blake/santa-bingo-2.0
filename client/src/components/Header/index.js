@@ -13,6 +13,12 @@ function Header() {
 
 	return(
 		<div className="header">
+			
+			{ state.inGame ? (
+				<div className="game-bg bg-grad-green"></div>
+			) : (
+				<div className="game-bg bg-grad-red"></div>
+			)}
 			<div className="jumbotron">
 				<Link to={'/'} style={{ textDecoration: 'none' }}>
 					{ state.inGame ? (

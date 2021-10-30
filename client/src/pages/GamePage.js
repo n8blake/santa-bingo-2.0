@@ -143,8 +143,6 @@ function GamePage(props){
     return(
          state.inGame ? (
             <div className="container">
-                <div className="game-bg bg-grad-green"></div>
-
                 <div>Called Cards Component</div>
 
                 { gameManager ? (
@@ -157,7 +155,6 @@ function GamePage(props){
                 )}
             </div>
         ) : (<div className="container">
-            <div className="game-bg bg-grad-red"></div>
             <h2>{gameName}</h2>
             { gameManager ? (
                 <div>
