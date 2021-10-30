@@ -3,6 +3,7 @@ const db = require("../models");
 const User = db.User;
 const Card = db.Card;
 const Game = db.Game;
+const { v4: uuidv4 } = require('uuid');
 
 mongoose.connect(
     process.env.MONGODB_URI ||
@@ -84,9 +85,12 @@ const makeCards = () => {
                 makeGame(id, user.firstName, players);
                 //console.log(id);
                 for(let i = 0; i < 4; i++){
+                    const cardUUID = uuidv4();
                     const card = {
                         player: id,
-                        active: true
+                        active: true,
+                        created: new Date(),
+                        uuid: cardUUID
                     }
                     // define col 0 'S'
                     // 5 unique random numbers between 1 and 15

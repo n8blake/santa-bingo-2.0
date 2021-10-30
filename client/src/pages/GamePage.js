@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useCallback } from "react";
-import { BrowserRouter as Router, Route, Redirect, useParams } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect, useParams, Link } from "react-router-dom";
 import { useStoreContext } from "../utils/GlobalState";
 import API from "../utils/API";
 import { SocketContext } from "../utils/socket";
@@ -164,7 +164,9 @@ function GamePage(props){
                 <div></div>
             )}
             <hr></hr>
-                <div>Card Manager Component</div>
+                <div>
+                    <Link to={'/cards/'} className="btn btn-outline-light" >Card Manager</Link>
+                </div>
             <hr></hr>
             <div>Players</div>
             <ul className="list-group-flush">{lobbyList}</ul>

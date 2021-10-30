@@ -48,6 +48,14 @@ export default {
         const data = {id: playerID}
         return axios.post(cardsURL, data);
     },
+    addNewCard: function(){
+        const newCardURL = '/api/cards/new/'
+        return axios.get(newCardURL);
+    },
+    deactivateCard: function(cardUUID){
+        const deactivateCardURL = `/api/cards/deactivate/${cardUUID}`;
+        return axios.delete(deactivateCardURL);
+    },
     getGames: function(){
         const gamesURL = '/api/game/list/'
         return axios.get(gamesURL);

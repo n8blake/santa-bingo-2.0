@@ -7,24 +7,21 @@ import './CardManagerPage.scss';
 
 function CardManagerPage(props){
 
+    const [state, dispatch] = useStoreContext();
     const [activeCardIndex, setActiveCardIndex] = useState(0); 
     const [wheelValue, setWheelValue] = useState(0);
-    const debouncedWheelValue = useDebounce(wheelValue, 35);
+    const [cards, setCards] = useState([]);
+    const debouncedWheelValue = useDebounce(wheelValue, 40);
 
     const cardTitle = ['S', 'a', 'n', 't', 'A'];
-    const cells = {
-        column_0: [2, 1, 9, 11, 3],
-        column_1: [16, 17, 29, 21, 30],
-        column_2: [42, 41, 0, 31, 32],
-        column_3: [52, 51, 49, 48, 53],
-        column_4: [72, 71, 69, 65, 63],
-    }
-
-    const cards = [1, 2, 3, 4];
 
     const cardContainer = cards.map(card => {
+        const cardIndex = cards.indexOf(card);
+        const activeCardIndexOffset = cardIndex - activeCardIndex;
         return(
-            <Card title={cardTitle} cells={cells} />
+            <span className="cardWrapper" key={cards.indexOf(card)}>
+                <Card clickHandler={() => handleCardIndexChange(activeCardIndexOffset)} title={cardTitle} data={card} />
+            </span>
         )
     })
 
@@ -35,18 +32,59 @@ function CardManagerPage(props){
     }
 
     const handleScroll = (event) => {
-        event.preventDefault();
+        //event.preventDefault();
         //console.log(event);
         setWheelValue(event.deltaX);
+    }
+
+    const fetchCards = () => {
+        API.getCards(state.userID)
+            .then(response => {
+                console.log(response);
+                if(response.data){
+                    setCards(response.data);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    }
+
+    const addNewCard = () => {
+        const oldCardsLength = cards.length;
+        API.addNewCard()
+            .then(response => {
+                if(response.data){
+                    setCards(response.data);
+                    setActiveCardIndex(oldCardsLength);
+                }
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
+
+    const deactivateCard = () => {
+        const card = cards[activeCardIndex];
+        if(cards.length > 1){
+            API.deactivateCard(card.uuid)
+            .then(response => {
+                console.log(response);
+                if(response.data){
+                    setCards(response.data);
+                    if(activeCardIndex > 0){
+                        setActiveCardIndex(activeCardIndex - 1);
+                    }
+                } 
+            })
+        }
     }
 
     useEffect(() => {
         // componentDidMount
         window.addEventListener('wheel', handleScroll);
         // translate card to active card index slot
-        //document.getElementById("myDIV").style.transform = "rotate(7deg)";
         const cardWrappers = document.getElementsByClassName("cardWrapper");
-        //console.log(cardWrappers);
 
         if(debouncedWheelValue !== 0 && wheelValue !== 0){
             if(debouncedWheelValue > 0 && activeCardIndex < cards.length - 1){
@@ -58,10 +96,7 @@ function CardManagerPage(props){
         }
 
         if(cardWrappers.length > 0){
-            //console.log(cardWrappers[0])
-            //cardWrappers[0].style.transform = "translate(-150%, 0%)"
             const transXp = -1 * (50 + (100 * activeCardIndex));
-            //console.log(transXp);
             for(let i = 0; i < cardWrappers.length; i++){
                 if(i === activeCardIndex){
                     cardWrappers[i].style.transform = `translate(${transXp}%, 0%) scale(1.07)`;
@@ -71,33 +106,40 @@ function CardManagerPage(props){
             }
         }
         
+        if(cards.length === 0){
+            fetchCards();
+        }
+
         return () => {
             // componentWillUnmount
             window.removeEventListener('wheel', handleScroll);
         }
 
-    }, [activeCardIndex, cards.length, debouncedWheelValue])
+    }, [activeCardIndex, cards, debouncedWheelValue, wheelValue])
 
     return(
         <div className="cardManagerContainer" >
             
             <div className="cardListContainer">
+                {cardContainer}
                 <span className="cardWrapper">
-                    <Card title={cardTitle} cells={cells} />
+                    <button className="btn text-light newCardBtn" onClick={addNewCard}><i class="bi bi-file-plus-fill"></i></button>
                 </span>
-                <span className="cardWrapper">
-                    <Card title={cardTitle} cells={cells} />
-                </span>
-                <span className="cardWrapper">
-                    <Card title={cardTitle} cells={cells} />
-                </span>
-                <span className="cardWrapper">
-                    <Card title={cardTitle} cells={cells} />
-                </span>
+                <div className="activeCardControls">
+                    { cards.length > 1 ? (
+                        <button className="btn text-light activeCardControlBtn mx-2" onClick={deactivateCard}><i class="bi bi-trash"></i></button>
+                    ) : (
+                        <span></span>
+                    )}
+                    
+                    
+                    <button className="btn text-light activeCardControlBtn mx-2"><i class="bi bi-printer"></i></button>
+                </div>
             </div>
+            
             <div className="cardIndexControls text-light">
-                <button className="btn btn-sm btn-light m-2" onClick={() => handleCardIndexChange(-1)}>back</button>
-                <button className="btn btn-sm btn-light m-2" onClick={() => handleCardIndexChange(1)}>next</button>
+                <button className="btn text-light activeCardControlBtn m-2" onClick={() => handleCardIndexChange(-1)}><i class="bi bi-arrow-left-circle-fill"></i></button>
+                <button className="btn text-light activeCardControlBtn m-2" onClick={() => handleCardIndexChange(1)}><i class="bi bi-arrow-right-circle-fill"></i></button>
             </div>
 
         </div>

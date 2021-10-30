@@ -27,7 +27,7 @@
     max-width: 500pt;
     padding: 20pt;
     transform: translate(-50%, 0%);
-    z-index: 2;
+    
     transition: transform .25s,;
     transition-timing-function: ease-in-out;
 }
@@ -50,4 +50,39 @@
     bottom: 40pt;
     left: 50%;
     transform: translateX(-50%);
+}
+
+.activeCardControls {
+    position: absolute;
+    bottom: -40pt;
+    left: 0%;
+    transform: translate(-50%, 50%);
+}
+
+.activeCardControlBtn {
+    font-size: 20pt;
+    opacity: 0.6;
+}
+
+.activeCardControlBtn:hover {
+    font-size: 20pt;
+    opacity: 1;
+    transition: opacity .25s;
+    transition-timing-function: ease-in-out;
+}
+
+.newCardBtn {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 160pt;
+    opacity: 0.5;
+}
+
+.newCardBtn:hover {
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 1;
+    transition: opacity .25s;
+    transition-timing-function: ease-in-out;
 }
