@@ -4,7 +4,7 @@ const Model = mongoose.model;
 const { v4: uuidv4 } = require('uuid');
 
 const CardSchema = new Schema({
-    player: { type: String, required: true },
+    player: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
     column_0: { type: Array, required: true },
     column_1: { type: Array, required: true },
     column_2: { type: Array, required: true },

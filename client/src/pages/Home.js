@@ -38,7 +38,6 @@ function Home(){
 
     return(
         <div className="container">
-            <div className="game-bg bg-grad-red"></div>
             <div className="d-flex justify-content-center">
                 <span>GAMES</span>
             </div>
@@ -51,7 +50,7 @@ function Home(){
             </div>
             <div className="d-flex justify-content-center">
                 
-                <Link to={"/game/new/"} className="btn btn-outline-light">CREATE NEW GAME</Link>
+                <Link to={"/newgame/"} className="btn btn-outline-light">CREATE NEW GAME</Link>
             </div>
             
         </div>

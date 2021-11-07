@@ -19,16 +19,21 @@ module.exports = {
                 .findOne({uuid: request.params.id})
                 .then(game => {
                     // find players
-                    const playerIds = game.players;
-                    User.find({uuid: {$in: playerIds}})
-                    .then(players => {
-                        game.players = players;
-                        response.json(game);
-                    })
-                    .catch(error => {
-                        response.status(422).json(error);
-                    })
-                    //response.json(dbModel);
+                    //console.log(game);
+                    if(game){
+                        const playerIds = game.players;
+                        User.find({uuid: {$in: playerIds}})
+                        .then(players => {
+                            game.players = players;
+                            response.json(game);
+                        })
+                        .catch(error => {
+                            response.status(422).json(error);
+                        })
+                    } else {
+                        response.status(404).send();
+                    }
+                    
                 })
                 .catch(error => {
                     console.log(error);
@@ -93,10 +98,59 @@ module.exports = {
             })
             .catch(error => {
                 response.status(422).json(error);
+            })    
+    },
+    startGame: function(gameUUID, userUUID){
+        return Game.findOne({uuid: gameUUID})
+            .then(game => {
+                if(game.creator === userUUID){
+                    // start game
+                    console.log("starting game");
+                    game.start_time = new Date();
+                    game.inGame = true;
+                    return Game.updateOne({uuid: gameUUID}, game)
+                        .then(result => {
+                            console.log(result);
+                            return result;
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            return error;
+                        });
+                } else {
+                    return;
+                }
             })
-        
-        
-        
+            .catch(error => {
+                console.log(error);
+                return error;
+            })
+    },
+    endGame: function(gameUUID, userUUID){
+        return Game.findOne({uuid: gameUUID})
+            .then(game => {
+                if(game.creator === userUUID){
+                    // end game
+                    console.log("ending game");
+                    game.end_time = new Date();
+                    game.inGame = false;
+                    return Game.updateOne({uuid: gameUUID}, game)
+                        .then(result => {
+                            console.log(result);
+                            return result;
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            return error;
+                        });
+                } else {
+                    return;
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                return error;
+            })
     }
         
     // 

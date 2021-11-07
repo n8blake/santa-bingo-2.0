@@ -10,6 +10,7 @@ import ProfilePage from "./pages/ProfilePage";
 import NoMatch from "./pages/NoMatch";
 import NewGamePage from "./pages/NewGame";
 import GamePage from "./pages/GamePage";
+import CardManagerPage from "./pages/CardManagerPage";
 import './App.scss';
 
 function App() {
@@ -19,19 +20,20 @@ function App() {
       <Router>
         <Header />
         <Switch>
-          
           <Route exact path={["/login/:token", "/login"]} children={<LoginPage />} />
-
           <PrivateRoute>
+            <Switch>
             <Route exact path={"/"} children={<Home />} />
             <Route exact path={"/profile"} children={<ProfilePage />}/>
-            
-            <Route exact path={`/game/:uuid`} >
+            <Route exact path={"/cards"} children={<CardManagerPage />}/>
+            <Route exact stict path={`/game/:uuid`} >
                 <GamePage />
             </Route> 
-            
-            
-            
+            <Route exact stict path={"/newgame/"} children={<NewGamePage />}/>
+            <Route>
+              <NoMatch />
+            </Route>
+            </Switch>
           </PrivateRoute>
           <Route>
             <NoMatch />
