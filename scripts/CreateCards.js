@@ -9,7 +9,7 @@ function getRandomInt(min, max) {
   }
 
 const createCards = async function(users){
-    return Card.remove({})
+    return Card.deleteMany({})
         .then(() => {
             return makeCards(users);
         })
@@ -24,7 +24,7 @@ const makeCards = function(users) {
     users.map(user => {
         const numCards = getRandomInt(3, 5);
         for(let i = 0; i < numCards; i++){
-            const card = generateCard(user.uuid);
+            const card = generateCard(user._id);
             const cardPromise = Card.create(card);
             cardsPromises.push(cardPromise);
         }
