@@ -25,7 +25,7 @@ module.exports = {
         for(let j = 0; j < 5; j++){
             let num;
             do {
-                num = getRandomInt(16, 30) 
+                num = getRandomInt(16, 31) 
             } while(card.column_1.indexOf(num) > -1)
             card.column_1.push(num);
         }
@@ -36,7 +36,7 @@ module.exports = {
         for(let j = 0; j < 5; j++){
             let num;
             do {
-                num = getRandomInt(31, 45); 
+                num = getRandomInt(31, 46); 
                 //console.log(num);
             } while(card.column_2.indexOf(num) > -1)
             card.column_2.push(num);
@@ -52,7 +52,7 @@ module.exports = {
         for(let j = 0; j < 5; j++){
             let num;
             do {
-                num = getRandomInt(46, 60); 
+                num = getRandomInt(46, 61); 
             } while(card.column_3.indexOf(num) > -1)
             card.column_3.push(num);
         }
@@ -63,7 +63,7 @@ module.exports = {
         for(let j = 0; j < 5; j++){
             let num;
             do {
-                num = getRandomInt(61, 75); 
+                num = getRandomInt(61, 76); 
             } while(card.column_4.indexOf(num) > -1)
             card.column_4.push(num);
         }
