@@ -6,6 +6,7 @@ import { SocketContext } from "../utils/socket";
 import './GamePage.scss';
 import { validate } from 'uuidv4';
 import Card from '../components/Card/Card';
+import CalledCards from "../components/CalledCards/CalledCards";
 import { SET_IN_GAME } from "../utils/actions";
 import NoMatch from "./NoMatch";
 
@@ -23,14 +24,6 @@ function GamePage(props){
     const [lobby, setLobby] = useState([]);
     const [validUuid, setValidUuid] = useState(false);
     const [badUuid, setBadUuid] = useState(false);
-    const cardTitle = ['S', 'a', 'n', 't', 'A'];
-    const cells = {
-        column_0: [2, 1, 9, 11, 3],
-        column_1: [16, 17, 29, 21, 30],
-        column_2: [42, 41, 0, 31, 32],
-        column_3: [52, 51, 49, 48, 53],
-        column_4: [72, 71, 69, 65, 63],
-    }
 
     const lobbyList = lobby.map(player => {
         return(<li className="list-group-item" key={player.uuid}>
@@ -140,7 +133,7 @@ function GamePage(props){
          (
             state.inGame ? (
                 <div className="container">
-                    <div>Called Cards Component</div>
+                    <CalledCards numbers={[0, 34, 5, 62, 75]} />
     
                     { gameManager ? (
                         <div className="d-flex justify-content-center">
