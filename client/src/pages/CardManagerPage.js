@@ -124,7 +124,7 @@ function CardManagerPage(props){
             <div className="cardListContainer">
                 {cardContainer}
                 <span className="cardWrapper">
-                    <button className="btn text-light newCardBtn" onClick={addNewCard}><i class="bi bi-file-plus-fill"></i></button>
+                    <button className="btn text-light newCardBtn" onClick={addNewCard}><i className="bi bi-file-plus-fill"></i></button>
                 </span>
                 <div className="activeCardControls">
                     { cards.length > 1 ? (
@@ -148,8 +148,8 @@ function CardManagerPage(props){
             </div>
             
             <div className="cardIndexControls text-light">
-                <button className="btn text-light activeCardControlBtn m-2" onClick={() => handleCardIndexChange(-1)}><i class="bi bi-arrow-left-circle-fill"></i></button>
-                <button className="btn text-light activeCardControlBtn m-2" onClick={() => handleCardIndexChange(1)}><i class="bi bi-arrow-right-circle-fill"></i></button>
+                <button className="btn text-light activeCardControlBtn m-2" onClick={() => handleCardIndexChange(-1)}><i className="bi bi-arrow-left-circle-fill"></i></button>
+                <button className="btn text-light activeCardControlBtn m-2" onClick={() => handleCardIndexChange(1)}><i className="bi bi-arrow-right-circle-fill"></i></button>
             </div>
 
         </div>
