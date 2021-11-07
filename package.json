@@ -31,6 +31,7 @@
     "fast-average-color-node": "^1.0.3",
     "if-env": "^1.0.4",
     "jsonwebtoken": "^8.5.1",
+    "lodash.isequal": "^4.5.0",
     "mongoose": "^5.12.14",
     "sass": "^1.35.1",
     "save": "^2.4.0",
