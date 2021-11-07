@@ -20,6 +20,20 @@ const USERS = [
       email: "katiedean@mac.com",
       color: 'yellow'
   },
+  {
+    firstName: "Laura",
+    lastName: "Roberts",
+    displayName: "LR",
+    email: "laurabyu@yahoo.com",
+    color: 'blue'
+  },
+  {
+    firstName: "Blake",
+    lastName: "Cooper",
+    displayName: "BC",
+    email: "blakecooper@email.com",
+    color: 'yellow'
+  }
 ];
 
 module.exports = USERS;
