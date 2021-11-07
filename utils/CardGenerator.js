@@ -1,13 +1,9 @@
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
-  }
+const getRandomInt = require('./randomInt');
   
 module.exports = {
-     generateCard: function(uuid) {
+     generateCard: function(playerID) {
         const card = {
-            player: uuid,
+            player: playerID,
             active: true
         }
         // define col 0 'S'
