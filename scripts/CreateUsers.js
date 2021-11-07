@@ -5,7 +5,7 @@ const db = require("../models");
 const User = db.User;
 
 const createUsers = async function(){
-    return User.remove({})
+    return User.deleteMany({})
         .then(() => {
             return new Promise((resolve, reject) => {
                 const userPromises = [];
