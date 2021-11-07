@@ -1,10 +1,12 @@
 const mongoose = require("mongoose");
 const db = require("../models");
 const GameRoom = db.GameRoom;
-//const User = db.User;
+const PlayerMark = db.PlayerMark;
 //const Card = db.Card;
 const Game = db.Game;
+
 //const { v4: uuidv4 } = require('uuid');
+const isEqual = require('lodash.isequal');
 
 mongoose.connect(
     process.env.MONGODB_URI ||
@@ -19,10 +21,11 @@ const createCards = require('./CreateCards');
 const createRoom = require('./CreateRoom');
 const addPlayerToRoom = require('./AddPlayerToRoom');
 const GamePlayer = require('./PlayGame');
+const checkForWin = require('../utils/checkForWin');
 
-const seed = async function(){
+const seed = async () => {
 
-    console.log("\n\tseeding database... \n")
+    console.log("\n\tseeding database... \n");
 
     const gameTypes = await createGameTypes();
     gameTypes.length ? console.log(`${gameTypes.length} game types created.`) : () => {
@@ -48,22 +51,22 @@ const seed = async function(){
     const creatorID = users[0]._id;
     const roomName = `${users[0].firstName}'s Game`;
     let room = await createRoom(creatorID, roomName);
-    console.log(room);
+    //console.log(room);
     room.roomName ? console.log(`${room.roomName} created.`) : () => {
         console.error("No room created");
         process.exit(1);
-    }
+    };
 
     // Have Users 2, 3 and 4 Join the game room    
     const addUser2 = await addPlayerToRoom(room._id, users[1]._id);
     const addUser3 = await addPlayerToRoom(room._id, users[2]._id);
     const addUser4 = await addPlayerToRoom(room._id, users[3]._id);
 
-    room = await GameRoom.findOne({_id: room._id});
+    room = await GameRoom.findOne({ _id: room._id });
     room.players.length ? console.log(`${room.players.length} players added to ${room.roomName}.`) : () => {
         console.error("No players added.");
         process.exit(1);
-    }
+    };
 
     let game = await GamePlayer.clearAllGames();
     // start the game of type 'bingo' and 3 cards per user
@@ -73,22 +76,114 @@ const seed = async function(){
         console.error("GamePlayer error");
         //console.log(game);
         process.exit(1);
-    } 
+    };
 
-    // output first populated game object
-    await logGameStatus(game, 'players');
-
+    // call number
+    //let gameUpdate = await GamePlayer.callNumber(game);
+    // mark for each user that number being called
+    //const round1Marks = await GamePlayer.markCards(game);
+    
     // until a user gets Bingo...
-        // call number
-    let gameUpdate = await GamePlayer.callNumber(game);
-    console.log(`Game updated.`);
-    await logGameStatus(game, 'numbers');
-        // mark for each user that number being called
-        // check for bingo
     // once a user gets bingo
     // end the game
 
-    // save the game history
+    let round = 0;
+    let playerWon = false;
+    while(round < 76 && !playerWon){
+        try {
+
+            // call a number
+            let populatedGame;
+            if(round === 0){
+                populatedGame = await GamePlayer.getPopulatedGame(game);
+            } else {
+                populatedGame = await GamePlayer.callNumber(game);
+            }
+            const number = populatedGame.numbers[populatedGame.numbers.length - 1].number;
+            
+            // mark for each user that number being called
+            const playersAsyncArray = populatedGame.players.map(async (player) => {
+                const playerCardsAsyncArray = player.cards.map(async (card) => {
+                    await GamePlayer.markCardForPlayer(game, player.player, card, number);
+                    
+                    // get the marks for a give card
+                    const marks = await PlayerMark.find({card: card._id})
+                                        .populate('player')
+                                        .populate('card')
+                                        .populate({
+                                            path: 'game',
+                                            model: 'Game',
+                                            populate: { 
+                                                path: 'gameTypeHistory',
+                                                populate: { path: 'gameType', 
+                                                            model: 'GameType'}
+                                            }
+                                        });
+                    // console.log('\x1b[33m%s\x1b[0m', `CARD ID: ${card._id}`); 
+                    // marks.map(mark => {
+                    //     console.log('\x1b[36m%s\x1b[0m', `MARK CARD ID: ${mark.card._id}`);
+                    //     if(!isEqual(card._id, mark.card._id)){
+                    //         console.log(mark.card._id);
+                    //         console.log(card._id);
+                    //         console.log('\x1b[31m%s\x1b[0m', 'missmatch')
+                    //     } else {
+                    //         console.log('\x1b[32m%s\x1b[0m', 'match')
+                    //     }
+                    // })
+                    const currentGameType = populatedGame.gameTypeHistory[populatedGame.gameTypeHistory.length - 1].gameType.type;
+                    const check = checkForWin(currentGameType, card, marks);
+                    if(check.win){
+                        console.log('\x1b[32m%s\x1b[0m', `\n${currentGameType}`);
+                        console.log(`${player.player.firstName} ${player.player.lastName} got ${currentGameType} on Card: ${card._id}`)
+                        const printCardResults = false;
+                        if(printCardResults){
+                            for(let i = 0; i < check.columns.length; i++){
+                                if(check.columns[i]){
+                                    console.log(`in column: ${i}`)
+                                }
+                            }
+                            for(let i = 0; i < check.rows.length; i++){
+                                if(check.rows[i]){
+                                    console.log(`on row: ${i}`)
+                                }
+                            }
+                            for(let i = 0; i < check.diagonals.length; i++){
+                                if(check.diagonals[i]){
+                                    console.log(`on diagonals: ${i}`)
+                                }
+                            }
+                        }
+                        //playerWon = true;
+                    }
+                })
+                Promise.all(playerCardsAsyncArray)
+                    .then(() => {})
+                    .catch( error => {
+                        console.error('\x1b[31m%s\x1b[0m', error);
+                    })
+            })
+            Promise.all(playersAsyncArray)
+                .then(() => {})
+                .catch( error => {
+                    console.error('\x1b[31m%s\x1b[0m', error);
+                })
+
+            // check for a win base on current game type
+            
+            if(round % 5 === 0 ){
+                console.log(`Round ${round}`);
+                //logGameStatus(game, 'numbers');
+            }
+            
+            if(round === 75){
+                console.log(`${populatedGame.numbers.length} numbers called.`);
+            }
+        } catch (error){
+            console.error(error);
+        }
+            //await GamePlayer.markCards(game);
+        round = round + 1;
+    }
 
 }
 
