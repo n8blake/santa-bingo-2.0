@@ -1,5 +1,7 @@
 const getRandomInt = require('./randomInt');
-  
+const chalk = require('chalk');
+const isEqual = require('lodash.isequal');
+
 module.exports = {
      generateCard: function(playerID) {
         const card = {
@@ -69,5 +71,43 @@ module.exports = {
         }
 
         return card;
+    },
+    printCard: function(card, marks){
+        // take a card object and output it to the console
+        const cardMarks = [];
+        const _marks = marks.map(mark => {
+            if(isEqual(card._id, mark.card._id)){
+                cardMarks.push(mark.number);
+            }
+        });
+
+
+        for(let i = 0; i < 5; i++){
+            if(i === 0){
+                console.log(chalk.underline('|  B |  I |  N |  G |  O |'));
+            }
+            const B = card.column_0[i];
+            const I = card.column_1[i];
+            const N = card.column_2[i];
+            const G = card.column_3[i];
+            const O = card.column_4[i];
+            const rowArr = [B, I, N, G, O];
+            let row = "| ";
+            rowArr.map(number => {
+                //console.log(number);
+                let str = "";
+                if(number < 10){
+                    str = ' ';
+                }
+                str = str + "" + number;
+                if(cardMarks.indexOf(number) > -1){
+                    str = chalk.green(str);
+                }
+                str = str + ' | ';
+                row = row + str;
+            })
+            //const row = `${B} | ${I} | ${N} | ${G} | ${O} |`;
+            console.log(chalk.underline(row));
+        }
     }
 }
