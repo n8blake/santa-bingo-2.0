@@ -16,6 +16,7 @@
   "author": "n8blake",
   "license": "MIT",
   "devDependencies": {
+    "chalk": "^4.1.2",
     "concurrently": "^6.3.0",
     "nodemon": "^2.0.13"
   },
