@@ -7,6 +7,8 @@ const PlayerMarkSchema = new Schema({
     card: { type: Schema.Types.ObjectId, required: true, ref: 'Card' },
     game: { type: Schema.Types.ObjectId, required: true, ref: 'Game' },
     number: { type: Number, required: true },
+    column: { type: Number, required: true },
+    row: { type: Number, required: true },
     timestamp: { type: Date, required: true, default: new Date()}
 });
 
