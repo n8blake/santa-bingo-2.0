@@ -5,6 +5,8 @@ import { LOGIN, SET_TOKEN, VALIDATE_TOKEN, SET_IN_GAME } from "../utils/actions"
 import API from "../utils/API";
 import "./LoginPage.scss";
 
+import CountDown from "../components/CountDown/CountDown";
+
 function LoginPage(props) {
     const [state, dispatch] = useStoreContext();
     const [email, setEmail] = useState("");
@@ -128,6 +130,7 @@ function LoginPage(props) {
                     <div>
                         <button className="btn btn-outline-primary px-4 m-4" onClick={submitLogin}>JOIN THE PARTY!</button>
                     </div>
+                    <CountDown label="Christmas" unitlDate={new Date('2021-12-25T00:00:00')} />
                 </div>
             ) : (
                 <div className="login-form">You are logged in!

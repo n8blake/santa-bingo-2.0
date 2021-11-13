@@ -1,0 +1,23 @@
+@import '../../theme-colors.scss';
+
+.count-down-container {    
+    margin: auto;
+    backdrop-filter: grayscale(0.5) opacity(0.8);
+    border-radius: 0.5em;
+    padding: 20pt;
+    color: $secondary;
+}
+
+.count-down-number {
+    color: $primary;
+    font-weight: 700;
+    margin-right: 4pt;
+    margin-left: 6pt;
+}
+
+.count-down-label {
+    color: $primary;
+    font-weight: 700;
+    margin-right: 4pt;
+    margin-left: 4pt;
+}
