@@ -28,9 +28,9 @@ function Home(){
     }, [])
 
     const gameListItems = gameNames.map(game => {
-        return(<li className="list-group-item" key={game.uuid}>
+        return(<li className="list-group-item" key={game._id}>
             <Link to={`/game/${game.uuid}`} className="d-flex justify-content-between gameName">
-                <span className="m-2 gameName">{game.name} </span>
+                <span className="m-2 gameName">{game.roomName} </span>
                 <span to={""} className="text-light"><i className="bi bi-caret-right-fill"></i></span>
             </Link>
         </li>)

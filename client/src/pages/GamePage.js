@@ -26,7 +26,7 @@ function GamePage(props){
     const [badUuid, setBadUuid] = useState(false);
 
     const lobbyList = lobby.map(player => {
-        return(<li className="list-group-item" key={player.uuid}>
+        return(<li className="list-group-item" key={player._id}>
             <div className="d-flex justify-content-between">
                 <div>
                     <span>{player.firstName} {player.lastName}</span>

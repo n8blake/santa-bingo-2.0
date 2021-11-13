@@ -44,10 +44,10 @@ module.exports = {
     // create game
     create: function(request, response){
         if(!request.session.token) response.status(401).send();
-        if(request.session.user){
-            console.log("USER");
-            console.log(request.session.user);
-        }
+        // if(request.session.user){
+        //     console.log("USER");
+        //     console.log(request.session.user);
+        // }
         if(request.body.gameName){
             const newGame = {
                 name: request.body.gameName,

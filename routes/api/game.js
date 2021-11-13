@@ -1,16 +1,18 @@
 const router = require("express").Router();
 const gameController = require("../../controllers/gameController");
+const gameRoomController = require("../../controllers/gameRoomController");
 
 // Matches with '/api/game/new/'
 router.route('/new/')
-    .post(gameController.create)
+    .post(gameRoomController.create)
 
 // Matches with '/api/game/list/'
 router.route('/list/')
-    .get(gameController.findAll)
+    .get(gameRoomController.findAll)
 
 // Matches with '/api/game/:id'
 router.route('/:id')
-    .get(gameController.find)
-    .post(gameController.update)
+    .get(gameRoomController.find)
+//     .post(gameRoomController.update)
+
 module.exports = router;
