@@ -7,6 +7,7 @@ const Game = db.Game;
 
 //const { v4: uuidv4 } = require('uuid');
 const isEqual = require('lodash.isequal');
+const chalk = require('chalk');
 
 mongoose.connect(
     process.env.MONGODB_URI ||
@@ -22,8 +23,23 @@ const createRoom = require('./CreateRoom');
 const addPlayerToRoom = require('./AddPlayerToRoom');
 const GamePlayer = require('./PlayGame');
 const checkForWin = require('../utils/checkForWin');
+const recordUniqueWin = require("./recordUniqueWin");
+const { printCard } = require("../utils/CardGenerator");
 
 const seed = async () => {
+
+    let resolveReturn = function(val){
+        console.log(chalk.green('resolved'));
+        return val;
+    };
+    let rejectReturn = function(val){
+        console.log(chalk.red('rejected'));
+        return val;
+    };;
+    let returnPromise;
+    // let returnPromise = new Promise((resolveReturn, rejectReturn) => {
+
+    // });
 
     console.log("\n\tseeding database... \n");
 
@@ -71,7 +87,7 @@ const seed = async () => {
     let game = await GamePlayer.clearAllGames();
     // start the game of type 'bingo' and 3 cards per user
     // select 3 random cards from each users' cards list for this game
-    game = await GamePlayer.startNewGame(room);
+    game = await GamePlayer.startNewGame(room, 'bingo');
     game.inGame ? console.log(`Game started.\n`) : () => {
         console.error("GamePlayer error");
         //console.log(game);
@@ -89,7 +105,9 @@ const seed = async () => {
 
     let round = 0;
     let playerWon = false;
-    while(round < 76 && !playerWon){
+    let winCount = 0;
+    returnPromise = new Promise(async (resolveReturn, rejectReturn) => {
+    while(round < 76 && winCount < 3){
         try {
 
             // call a number
@@ -107,54 +125,50 @@ const seed = async () => {
                     await GamePlayer.markCardForPlayer(game, player.player, card, number);
                     
                     // get the marks for a give card
-                    const marks = await PlayerMark.find({card: card._id})
-                                        .populate('player')
-                                        .populate('card')
-                                        .populate({
-                                            path: 'game',
-                                            model: 'Game',
-                                            populate: { 
-                                                path: 'gameTypeHistory',
-                                                populate: { path: 'gameType', 
-                                                            model: 'GameType'}
-                                            }
-                                        });
-                    // console.log('\x1b[33m%s\x1b[0m', `CARD ID: ${card._id}`); 
-                    // marks.map(mark => {
-                    //     console.log('\x1b[36m%s\x1b[0m', `MARK CARD ID: ${mark.card._id}`);
-                    //     if(!isEqual(card._id, mark.card._id)){
-                    //         console.log(mark.card._id);
-                    //         console.log(card._id);
-                    //         console.log('\x1b[31m%s\x1b[0m', 'missmatch')
-                    //     } else {
-                    //         console.log('\x1b[32m%s\x1b[0m', 'match')
-                    //     }
-                    // })
-                    const currentGameType = populatedGame.gameTypeHistory[populatedGame.gameTypeHistory.length - 1].gameType.type;
+                    const marks = await PlayerMark.find({card: card._id, player:player.player._id, game: game._id})
+                                        //.populate('player')
+                                        //.populate('card')
+                                        // .populate({
+                                        //     path: 'game',
+                                        //     model: 'Game',
+                                        //     populate: { 
+                                        //         path: 'gameTypeHistory',
+                                        //         populate: { path: 'gameType', 
+                                        //                     model: 'GameType'}
+                                        //     }
+                                        // });
+
+                    const currentGameType = populatedGame.gameTypeHistory[populatedGame.gameTypeHistory.length - 1].gameType;
                     const check = checkForWin(currentGameType, card, marks);
-                    if(check.win){
-                        console.log('\x1b[32m%s\x1b[0m', `\n${currentGameType}`);
-                        console.log(`${player.player.firstName} ${player.player.lastName} got ${currentGameType} on Card: ${card._id}`)
-                        const printCardResults = false;
-                        if(printCardResults){
-                            for(let i = 0; i < check.columns.length; i++){
-                                if(check.columns[i]){
-                                    console.log(`in column: ${i}`)
-                                }
-                            }
-                            for(let i = 0; i < check.rows.length; i++){
-                                if(check.rows[i]){
-                                    console.log(`on row: ${i}`)
-                                }
-                            }
-                            for(let i = 0; i < check.diagonals.length; i++){
-                                if(check.diagonals[i]){
-                                    console.log(`on diagonals: ${i}`)
-                                }
-                            }
+                    
+                    //const record = await recordUniqueWin(check, card, player.player, game);
+                    recordUniqueWin(check, card, player.player, game).then((record) => {
+                        //console.log(record);
+                        if(record){
+                            console.log(chalk.keyword('orange')('recorded'));
+                            console.log(record);
+                            playerWon = true;
+                            winCount++;
+                            const calledNumbers = populatedGame.numbers.map(calledNumber => {
+                                return calledNumber.number;
+                            }).sort(function(a, b) {
+                                return a - b;
+                            });
+                            console.log(chalk.cyan(`${calledNumbers.length} Numbers Called:`));
+                            console.log(chalk.yellow(calledNumbers));
+                            console.log(chalk.bgGreen(" " + chalk.black(currentGameType.type) + " "));
+                            console.log(`${player.player.firstName} ${player.player.lastName} got ${currentGameType.type} on Card: ${card._id}`);
+                            printCard(card, marks);
+                            console.log();
                         }
-                        //playerWon = true;
-                    }
+                    })
+                    .catch(error => {
+                        console.error(chalk.red(error));
+                    })
+                    
+                         
+
+                    
                 })
                 Promise.all(playerCardsAsyncArray)
                     .then(() => {})
@@ -177,14 +191,21 @@ const seed = async () => {
             
             if(round === 75){
                 console.log(`${populatedGame.numbers.length} numbers called.`);
+                
             }
+            
         } catch (error){
-            console.error(error);
+            console.error(chalk.red(error));
+            rejectReturn();
         }
             //await GamePlayer.markCards(game);
         round = round + 1;
     }
+    resolveReturn('done');
+    
 
+    });
+    return returnPromise;
 }
 
 const logGameStatus = async (game, property) => {
@@ -202,7 +223,7 @@ const logGameStatus = async (game, property) => {
 }
 
 seed().then(result => {
-    //console.log(result);
+    console.log(result);
     process.exit(0);
 })
 .catch(error => {

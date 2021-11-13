@@ -3,7 +3,7 @@ const Game = db.Game;
 const GameType = db.GameType;
 const Card = db.Card;
 const PlayerMark = db.PlayerMark;
-
+const Win = db.Win;
 const randomInt = require('../utils/randomInt');
 
 module.exports = {
@@ -11,7 +11,7 @@ module.exports = {
         // clear old marks
         await PlayerMark.deleteMany({});
         // clear old wins
-
+        await Win.deleteMany({});
         return Game.deleteMany({});
     },
     getPopulatedGame: async function(game) {
@@ -37,7 +37,7 @@ module.exports = {
         })
         return populatedGame;
     },
-    startNewGame: async function(room){
+    startNewGame: async function(room, gameType){
         const joinedPlayers = [];
         room.players.map(async (player) => {
             const cards = await Card.find({player: player._id, active: true}).select('_id').limit(3);
@@ -53,7 +53,12 @@ module.exports = {
             joinedPlayers.push(joinedPlayer);
         })
 
-        const type = await GameType.findOne({type: 'bingo'});
+        let _type = 'bingo';
+        if(gameType){
+            _type = gameType;
+        }
+        
+        const type = await GameType.findOne({type: _type});
         const newGame = {
             start_time: new Date(),
             inGame: true,
@@ -103,9 +108,8 @@ module.exports = {
         // Number is valid if: 
         // it is not already marked on the card...
         let markValidInPlayersMarksList = false;
-        const marks = [];
-        playersMarks.map(mark => {
-            marks.push(mark.number);
+        const marks = playersMarks.map(mark => {
+            return mark.number;
         });
         if(marks.indexOf(number) === -1){
             markValidInPlayersMarksList = true;
@@ -116,9 +120,8 @@ module.exports = {
         // get the game in its latest state
         const _game = await Game.findOne({_id: game._id});
         let markValidInGameNumberList = false;
-        const gameNumbers = [];
-        _game.numbers.map(numberObject => {
-            gameNumbers.push(numberObject.number);
+        const gameNumbers = _game.numbers.map(numberObject => {
+            return numberObject.number;
         })
         if(gameNumbers.indexOf(number) !== -1){
             markValidInGameNumberList = true;
@@ -127,21 +130,43 @@ module.exports = {
         // AND 
         // it appears on the card trying to be marked
         let markValidInCardNumbersList = false;
+        let column;
+        let row;
         if(number > 0 && number <= 15) {
             // check column 0
-            if(card.column_0.indexOf(number) !== -1) markValidInCardNumbersList = true;
+            if(card.column_0.indexOf(number) !== -1) {
+                column = 0;
+                row = card.column_0.indexOf(number);
+                markValidInCardNumbersList = true
+            };
         } else if(number >= 16 && number <= 30) {
             // check column 1
-            if(card.column_1.indexOf(number) !== -1) markValidInCardNumbersList = true;
+            if(card.column_1.indexOf(number) !== -1) {
+                column = 1;
+                row = card.column_1.indexOf(number);
+                markValidInCardNumbersList = true
+            };
         } else if(number >= 31 && number <= 45 || number === 0) {
             // check column 2
-            if(card.column_2.indexOf(number) !== -1) markValidInCardNumbersList = true;
+            if(card.column_2.indexOf(number) !== -1) {
+                column = 2;
+                row = card.column_2.indexOf(number);
+                markValidInCardNumbersList = true
+            };
         } else if(number >= 46 && number <= 60) {
             // check column 3
-            if(card.column_3.indexOf(number) !== -1) markValidInCardNumbersList = true;
+            if(card.column_3.indexOf(number) !== -1) {
+                column = 3;
+                row = card.column_3.indexOf(number);
+                markValidInCardNumbersList = true
+            };
         } else if(number >= 61 && number <= 75) {
             // check column 4
-            if(card.column_4.indexOf(number) !== -1) markValidInCardNumbersList = true;
+            if(card.column_4.indexOf(number) !== -1) {
+                column = 4;
+                row = card.column_4.indexOf(number);
+                markValidInCardNumbersList = true
+            };
         }
 
         if(markValidInPlayersMarksList && 
@@ -153,7 +178,9 @@ module.exports = {
                 player: player._id,
                 card: card._id,
                 game: game._id,
-                number: number
+                number: number,
+                column: column,
+                row: row
             }
             return PlayerMark.create(mark)
             // return PlayerMark.create(mark).then(() => {
