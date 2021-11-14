@@ -4,6 +4,6 @@ module.exports = {
     User: require("./user.js"),
     GameRoom: require("./gameroom.js"),
     GameType: require("./gametype.js"),
-    PlayerMark: require("./playerMark.js"), 
-    Win: require("./Win.js")
+    // PlayerMark: require("./playerMark.js"), 
+    // Win: require("./Win.js")
 };
