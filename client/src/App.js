@@ -17,28 +17,32 @@ import './App.scss';
 function App() {
   return (
     <SocketContext.Provider value={socket}>
-    <StoreProvider>
-      <Router>
-        <Header />
+<StoreProvider>
+  <Router>
+    <Header />
+    <Switch>
+      <Route exact path={["/login/:token", "/login"]} children={<LoginPage />} />
+      <PrivateRoute>
         <Switch>
-          <Route>
-            <div className="container">
-              <div className="d-flex justify-content-center m-4">
-                Santa Bingo is coming...
-              </div>
-              <div className="d-flex justify-content-center m-4">
-                <CountDown label="Christmas" unitlDate={new Date('2021-12-25T00:00:00')} />
-              </div>
-            </div>
-          </Route>
-          
-          <Route>
-            <NoMatch />
-          </Route>
+        <Route exact path={"/"} children={<Home />} />
+        <Route exact path={"/profile"} children={<ProfilePage />}/>
+        <Route exact path={"/cards"} children={<CardManagerPage />}/>
+        <Route exact stict path={`/game/:uuid`} >
+            <GamePage />
+        </Route> 
+        <Route exact stict path={"/newgame/"} children={<NewGamePage />}/>
+        <Route>
+          <NoMatch />
+        </Route>
         </Switch>
-      </Router>
-    </StoreProvider>
-    </SocketContext.Provider>
+      </PrivateRoute>
+      <Route>
+        <NoMatch />
+      </Route>
+    </Switch>
+  </Router>
+</StoreProvider>
+</SocketContext.Provider>
   );
 }
 
