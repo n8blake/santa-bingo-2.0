@@ -28,7 +28,7 @@ router.route("/")
            console.log(error);
        })
     } else {
-        response.status(401).send({message:"Please log in."});
+        response.status(401).json({message:"Please log in."});
     }
   });
 
@@ -40,8 +40,7 @@ router.route("/")
         const name = request.body.name;
         // make sure what was sent is a vaild email address
         if(!email || !name){
-            response.status(403);
-            response.send({
+            response.status(403).json({
                 message: "Bad request.",
             })
         }
@@ -125,31 +124,26 @@ router.route("/validate")
     .post((request, response) => {
         const token = request.body.token;
         if (!token) {
-            response.status(403)
-            response.send("Can't verify user.")
+            response.status(403).send("Can't verify user.")
             return
         }
         let decoded
         try {
             decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
         } catch {
-            response.status(403)
-            response.send("Invalid auth credentials.")
+            response.status(403).send("Invalid auth credentials.")
             return
         }
         if (!decoded.hasOwnProperty("email") || !decoded.hasOwnProperty("expirationDate")) {
-            response.status(403)
-            response.send("Invalid auth credentials.")
+            response.status(403).send("Invalid auth credentials.")
             return
         }
         const { expirationDate } = decoded
         if (expirationDate < new Date()) {
-            res.status(403)
-            res.send("Token has expired.")
+            res.status(403).send("Token has expired.")
             return
         }
-        response.status(200)
-        response.send("User has been validated.")
+        response.status(200).send("User has been validated.")
     });
 
 module.exports = router;
