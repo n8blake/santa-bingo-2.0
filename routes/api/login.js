@@ -1,8 +1,8 @@
-const { request } = require("express");
-const router = require("express").Router();
-const jwt = require("jsonwebtoken");
+const { request, response } = require('express');
+const router = require('express').Router();
+const jwt = require('jsonwebtoken');
 const usersController = require("../../controllers/usersController");
-
+const passport = require('passport');
 // Login Token Generator
 // Generate token
 const makeToken = (email) => {
@@ -32,8 +32,19 @@ router.route("/")
     }
   });
 
-// Matches with '/api/login/'
-router.route("/")
+//authenticate with passport
+router.route('/').post(
+    passport.authenticate('local', { session: true, failureFlash: 'Invalid username or password.' }),
+    function(request, response){
+        console.log(request.user.email);
+        request.session.user = request.user;
+        const token = makeToken(request.user.email);
+        response.status(200).json({token:token});
+    }
+);
+
+// Matches with '/api/login/old/'
+router.route("/old/")
     .post((request, response) => {
         console.log(request.body);
         const email = request.body.email;
