@@ -58,7 +58,9 @@ const configure = function(passport){
                         return done(null, false, { message: 'Invalid auth credentials.' });
                     }
                     const { expirationDate } = decoded
-                    if (expirationDate < new Date()) {
+                    console.log(expirationDate);
+                    const expirationDateObject = new Date(expirationDate);
+                    if (expirationDateObject < new Date()) {
                         //res.status(403).send("Token has expired.")
                         return done(null, false, { message: 'Token has expired.' });
                     }
