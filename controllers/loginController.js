@@ -2,7 +2,7 @@ const { User } = require("../models");
 //const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const nodeMailer = require("nodemailer");
-
+const generateEmail = require('../utils/EmailGenerator');
 const makeToken = require('../utils/TokenGenerator');
 
 module.exports = {
@@ -94,33 +94,23 @@ module.exports = {
                         });
                         // Make email template for magic link
                         console.log("creating email template");
-                        const emailTemplate = ({ email, link }) => `
-                            <h2>${email}</h2>
-                            <p>Here's the link to reset your passord. The link expires in 24 hours.</p>
-                            <p>${link}</p>
-                        `
+                       
                         console.log("creating token...");
                         const token = makeToken(email, 24);
                         const link = process.env.NODE_ENV === 'development' ? (`http://localhost:3001/login/${token}`) : (`https://santabingo.app/login/${token}`);
+                        const emailHtml = generateEmail(link);
                         const mailOptions = {
                             from: "no-reply@santabingo.app",
-                            html: emailTemplate({
-                                email,
-                                link: link,
-                            }),
+                            html: emailHtml,
                             subject: "Password Reset",
                             to: email,
                         };
-                        console.log(process.env.EMAIL_USER);
-                        console.log(process.env.EMAIL_PASSWORD);
-                        console.log(process.env.EMAIL_HOST);
                         transport.sendMail(mailOptions, (error) => {
                             if (error) {
                                 console.error(error);
                                 response.status(400).json(error);
                             } else {
-                                console.log(`email sent to ${email}`);
-                                
+                                console.log(`Email sent to ${email}`);
                                 response.status(200).send(`pw reset link sent to ${email}`);
                             }
                         });
