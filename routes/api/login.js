@@ -6,16 +6,6 @@ const loginController = require('../../controllers/loginController');
 const passport = require('passport');
 const makeToken = require('../../utils/TokenGenerator');
 
-// Login Token Generator
-// Generate token
-// const makeToken = (email, expiryTimeInHours) => {
-//     const expirationDate = new Date();
-//     expirationDate.setHours(new Date().getHours() + expiryTimeInHours);
-//     // Be sure to configure .env with the JWT_SECRET_KEY
-//     return jwt.sign({ email, expirationDate }, process.env.JWT_SECRET_KEY);
-//   };
-
-
 // Matches with '/api/login/'
     //authenticate with passport
 router.route('/')
@@ -31,7 +21,10 @@ router.route('/refresh/')
 // Matches with '/api/login/reset/'
 router.route('/reset/')
     .all(loginController.sendResetEmail)
-    //.post(loginController.resetPassword)
+
+// Matches with '/api/login/reset/:token'
+router.route('/reset/:token')
+    .post(loginController.resetPassword)
 
 // Matches with '/api/login/old/'
 
