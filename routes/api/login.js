@@ -26,6 +26,9 @@ router.route('/reset/')
 router.route('/reset/:token')
     .post(loginController.resetPassword)
 
+// Matches with '/api/login/new/'
+router.route('/new/')
+    .post(loginController.newUserAccount)
 // Matches with '/api/login/old/'
 
 router.route("/old/")
