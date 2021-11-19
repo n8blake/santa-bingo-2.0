@@ -171,5 +171,32 @@ module.exports = {
         } else {
             response.status(404).send("Not Found");
         }
+    },
+    newUserAccount: function(request, response){
+        if(request.body.email){
+            User.findOne({email: request.body.email}).then(dbResult => {
+                if(!dbResult){
+                    User.create(request.body).then(user => {
+                        if(user){
+                            const token = makeToken(user.email, 1);
+                            response.status(200).json({token: token});
+                        } else {
+                            response.status(400).send("error creating user");
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        response.status(422).json(error.message);
+                    })
+                } else {
+                    response.status(409).send('Email address already registered.')
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                response.status(400).json(error);
+            })
+        }
+        
     }
 }
