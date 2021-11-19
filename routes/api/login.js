@@ -5,46 +5,98 @@ const usersController = require("../../controllers/usersController");
 const passport = require('passport');
 // Login Token Generator
 // Generate token
-const makeToken = (email) => {
+const makeToken = (email, expiryTimeInHours) => {
     const expirationDate = new Date();
-    expirationDate.setHours(new Date().getHours() + 1);
+    expirationDate.setHours(new Date().getHours() + expiryTimeInHours);
     // Be sure to configure .env with the JWT_SECRET_KEY
     return jwt.sign({ email, expirationDate }, process.env.JWT_SECRET_KEY);
   };
 
-router.route("/")
-  .get((request, response) => {
-    if(request.session.user){
-       usersController.findMePrivate(request.session.user.email).then(result => {
-        console.log(result);
-        const data = {};
-        data.token = request.session.token;
-        if(result.email){
-            data.user = result;
-        }
-        console.log(data);
-        response.send(data);
-       }).catch(error => {
-           console.log(error);
-       })
-    } else {
-        response.status(401).json({message:"Please log in."});
-    }
-  });
 
-//authenticate with passport
-router.route('/').post(
-    passport.authenticate('local', { session: true, failureFlash: 'Invalid username or password.' }),
-    function(request, response){
-        console.log(request.user.email);
-        request.session.user = request.user;
-        const token = makeToken(request.user.email);
-        response.status(200).json({token:token});
-    }
-);
+// Matches with '/api/login/'
+    //authenticate with passport
+router.route('/')
+    .get((request, response) => {
+        if(request.session.refreshToken){
+            try {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+                if (!decoded.hasOwnProperty("email") || !decoded.hasOwnProperty("expirationDate")) {
+                    response.status(401).send("Invalid auth credentials.");
+                }
+                const { expirationDate } = decoded;
+                const expirationDateObject = new Date(expirationDate);
+                if (expirationDateObject < new Date()) {
+                    response.status(403).send("Token has expired. Login again.");
+                } else {
+                    const token = makeToken(decoded.email, 1);
+                    response.status(200).json({token:token});
+                }
+
+            } catch (error) {
+                response.status(400).json(error);
+            }
+        } else {
+            response.status(401).send("Unknown user. Login and request refresh token.");
+        }
+    })
+    .post(
+        passport.authenticate('local', { session: true, failureFlash: 'Invalid username or password.' }),
+        function(request, response){
+            console.log(request.user.email);
+            request.session.user = request.user;
+            const token = makeToken(request.user.email, 1);
+            response.status(200).json({token:token});
+        }
+    )
+// Matches with '/api/login/refresh/'
+router.route('/refresh/')
+    .get((request, response) => {
+        if(request.headers.token){
+            try {
+                const decoded = jwt.verify(request.headers.token, process.env.JWT_SECRET_KEY);
+                if (!decoded.hasOwnProperty("email") || !decoded.hasOwnProperty("expirationDate")) {
+                    response.status(401).send("Invalid auth credentials.");
+                }
+                const { expirationDate } = decoded;
+                const expirationDateObject = new Date(expirationDate);
+                if (expirationDateObject < new Date()) {
+                    response.status(403).send("Token has expired. Login again.");
+                } else {
+                    const refreshToken = makeToken(decoded.email, 24 * 7); // Refresh token can stay in session for 1 week -- same as session length
+                    const token = makeToken(request.user.email, 1);
+                    response.status(200).json({token:token});
+                }
+            } catch (error) {
+                console.log(error);
+                response.status(401).send("Unknown user. Invalid token presented in header.");
+            }
+        } else {
+            response.status(401).send("Unknown user. Authorization token not present in headers.");
+        }
+    })
+
 
 // Matches with '/api/login/old/'
+
 router.route("/old/")
+    .get((request, response) => {
+        if(request.session.user){
+        usersController.findMePrivate(request.session.user.email).then(result => {
+            console.log(result);
+            const data = {};
+            data.token = request.session.token;
+            if(result.email){
+                data.user = result;
+            }
+            console.log(data);
+            response.send(data);
+        }).catch(error => {
+            console.log(error);
+        })
+        } else {
+            response.status(401).json({message:"Please log in."});
+        }
+    })
     .post((request, response) => {
         console.log(request.body);
         const email = request.body.email;
