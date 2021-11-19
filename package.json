@@ -36,6 +36,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash.isequal": "^4.5.0",
     "mongoose": "^5.12.14",
+    "nodemailer": "^6.7.1",
     "passport": "^0.5.0",
     "passport-custom": "^1.1.1",
     "passport-http-bearer": "^1.0.1",
