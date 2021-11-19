@@ -1,80 +1,37 @@
-const { request, response } = require('express');
+//const { request, response } = require('express');
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const usersController = require("../../controllers/usersController");
+const loginController = require('../../controllers/loginController');
 const passport = require('passport');
+const makeToken = require('../../utils/TokenGenerator');
+
 // Login Token Generator
 // Generate token
-const makeToken = (email, expiryTimeInHours) => {
-    const expirationDate = new Date();
-    expirationDate.setHours(new Date().getHours() + expiryTimeInHours);
-    // Be sure to configure .env with the JWT_SECRET_KEY
-    return jwt.sign({ email, expirationDate }, process.env.JWT_SECRET_KEY);
-  };
+// const makeToken = (email, expiryTimeInHours) => {
+//     const expirationDate = new Date();
+//     expirationDate.setHours(new Date().getHours() + expiryTimeInHours);
+//     // Be sure to configure .env with the JWT_SECRET_KEY
+//     return jwt.sign({ email, expirationDate }, process.env.JWT_SECRET_KEY);
+//   };
 
 
 // Matches with '/api/login/'
     //authenticate with passport
 router.route('/')
-    .get((request, response) => {
-        if(request.session.refreshToken){
-            try {
-                const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-                if (!decoded.hasOwnProperty("email") || !decoded.hasOwnProperty("expirationDate")) {
-                    response.status(401).send("Invalid auth credentials.");
-                }
-                const { expirationDate } = decoded;
-                const expirationDateObject = new Date(expirationDate);
-                if (expirationDateObject < new Date()) {
-                    response.status(403).send("Token has expired. Login again.");
-                } else {
-                    const token = makeToken(decoded.email, 1);
-                    response.status(200).json({token:token});
-                }
-
-            } catch (error) {
-                response.status(400).json(error);
-            }
-        } else {
-            response.status(401).send("Unknown user. Login and request refresh token.");
-        }
-    })
+    .get(loginController.defaultLogin)
     .post(
         passport.authenticate('local', { session: true, failureFlash: 'Invalid username or password.' }),
-        function(request, response){
-            console.log(request.user.email);
-            request.session.user = request.user;
-            const token = makeToken(request.user.email, 1);
-            response.status(200).json({token:token});
-        }
+        loginController.defaultLoginLocal
     )
 // Matches with '/api/login/refresh/'
 router.route('/refresh/')
-    .get((request, response) => {
-        if(request.headers.token){
-            try {
-                const decoded = jwt.verify(request.headers.token, process.env.JWT_SECRET_KEY);
-                if (!decoded.hasOwnProperty("email") || !decoded.hasOwnProperty("expirationDate")) {
-                    response.status(401).send("Invalid auth credentials.");
-                }
-                const { expirationDate } = decoded;
-                const expirationDateObject = new Date(expirationDate);
-                if (expirationDateObject < new Date()) {
-                    response.status(403).send("Token has expired. Login again.");
-                } else {
-                    const refreshToken = makeToken(decoded.email, 24 * 7); // Refresh token can stay in session for 1 week -- same as session length
-                    const token = makeToken(request.user.email, 1);
-                    response.status(200).json({token:token});
-                }
-            } catch (error) {
-                console.log(error);
-                response.status(401).send("Unknown user. Invalid token presented in header.");
-            }
-        } else {
-            response.status(401).send("Unknown user. Authorization token not present in headers.");
-        }
-    })
+    .get(loginController.refreshToken)
 
+// Matches with '/api/login/reset/'
+router.route('/reset/')
+    .all(loginController.sendResetEmail)
+    //.post(loginController.resetPassword)
 
 // Matches with '/api/login/old/'
 
