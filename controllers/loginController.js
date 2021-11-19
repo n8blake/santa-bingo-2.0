@@ -130,5 +130,46 @@ module.exports = {
         } else {
             response.status(400).send("No email provided to reset.")
         }
+    },
+    resetPassword: function(request, response){
+        if(request.params.token && request.body.password && request.body.passwordConfirmation){
+            if(request.body.password !== request.body.passwordConfirmation){
+                response.status(400).send("Password and password confirmation do not match.");
+            } else {
+                try { 
+                    const token = request.params.token;
+                    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+                    const { email, expirationDate } = decoded;
+                    const expirationDateObject = new Date(expirationDate);
+                    if(expirationDateObject < new Date()){
+                        response.status(403).send("Reset token no longer valid. Request new password reset token.");
+                    } else {
+                        User.findOne({email: email}).then(user => {
+                            user.password = request.body.password;
+                            user.save().then(updatedUser => {
+                                if(user === updatedUser){
+                                    response.status(200).send("password updated")
+                                } else {
+                                    response.status(422).send("error updating password");
+                                }
+                            })
+                            .catch(error => {
+                                console.log(error);
+                                response.status(400).json(error);
+                            })
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            response.status(400).json(error);
+                        })
+                    }
+                } catch (error) {
+                    console.log(error);
+                    response.status(400).json(error);
+                }
+            }
+        } else {
+            response.status(404).send("Not Found");
+        }
     }
 }
