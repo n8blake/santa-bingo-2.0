@@ -3,14 +3,14 @@ const isEqual = require('lodash.isequal');
 
 module.exports = {
     findAll: function (request, response){
-        User.find({}, '-created -__v -password')
+        User.find({}, '-email -created -__v -password')
             .then(dbModel => {
                 response.json(dbModel)
             })
             .catch(error => response.status(422).json(error));
     },
     findById: function(request, response){
-        User.findOne({_id: request.params.id}, '-created -__v -password')
+        User.findOne({_id: request.params.id}, '-email -created -__v -password')
             .then(user => {
                 if(user){
                     response.json(user);
@@ -33,7 +33,7 @@ module.exports = {
                         .then(dbResult => response.json(dbResult))
                         .catch(error => response.status(422).json(error))
                 } else {
-                    response.status(403).send("unauthorize");
+                    response.status(403).send("Unauthorize");
                 }
             })
             .catch(error => response.status(422).json(error));
