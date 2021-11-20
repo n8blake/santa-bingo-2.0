@@ -11,6 +11,7 @@ const UserSchema = new Schema({
     password: { type: String, required: true },
     displayName: { type: String, required: true },
     email: { type: String, required: true, index: { unique: true } },
+    role: { type: String, required: true, default: 'user'},
     created: { type: Date, required: true, default: new Date() },
     uuid: { type: String, required: true, default: uuidv4, index: { unique: true }},
 });
