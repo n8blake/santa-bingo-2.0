@@ -1,14 +1,16 @@
 const router = require("express").Router();
 const cardController = require("../../controllers/cardController");
+const passport = require('passport');
 
-// Match with '/api/cards/player/'
-router.route("/player/")
-    .post(cardController.findCardsByPlayerID)
+// Match with '/api/cards/'
+router.route('/')
+    .get(cardController.getCards);
 
 router.route('/new/')
     .get(cardController.newCard);
 
-router.route('/deactivate/:uuid')
-    .delete(cardController.deactivateCard);
+router.route('/:id')
+    .get(cardController.findCardById)
+    .patch(cardController.activateCard);
 
 module.exports = router;
