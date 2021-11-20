@@ -21,6 +21,7 @@ const USERS = [
 	  {
           firstName: "Nate",
           lastName: "Blake",
+          password: "password",
           displayName: "N8",
           email: "n8blake@mac.com",
           color: 'red'
@@ -28,6 +29,7 @@ const USERS = [
       {
         firstName: "Spencer",
         lastName: "Blake",
+        password: "password",
         displayName: "SB",
         email: "spencer.blake@slcc.edu",
         color: 'blue'
@@ -35,6 +37,7 @@ const USERS = [
     {
         firstName: "Kristin",
         lastName: "Cooper",
+        password: "password",
         displayName: "KC",
         email: "katiedean@mac.com",
         color: 'yellow'

@@ -1,47 +1,62 @@
-const { request } = require("express");
-const router = require("express").Router();
-const jwt = require("jsonwebtoken");
+//const { request, response } = require('express');
+const router = require('express').Router();
+const jwt = require('jsonwebtoken');
 const usersController = require("../../controllers/usersController");
-
-// Login Token Generator
-// Generate token
-const makeToken = (email) => {
-    const expirationDate = new Date();
-    expirationDate.setHours(new Date().getHours() + 1);
-    // Be sure to configure .env with the JWT_SECRET_KEY
-    return jwt.sign({ email, expirationDate }, process.env.JWT_SECRET_KEY);
-  };
-
-router.route("/")
-  .get((request, response) => {
-    if(request.session.user){
-       usersController.findMePrivate(request.session.user.email).then(result => {
-        console.log(result);
-        const data = {};
-        data.token = request.session.token;
-        if(result.email){
-            data.user = result;
-        }
-        console.log(data);
-        response.send(data);
-       }).catch(error => {
-           console.log(error);
-       })
-    } else {
-        response.status(401).send({message:"Please log in."});
-    }
-  });
+const loginController = require('../../controllers/loginController');
+const passport = require('passport');
+const makeToken = require('../../utils/TokenGenerator');
 
 // Matches with '/api/login/'
-router.route("/")
+    //authenticate with passport
+router.route('/')
+    .get(loginController.defaultLogin)
+    .post(
+        passport.authenticate('local', { session: true, failureFlash: 'Invalid username or password.' }),
+        loginController.defaultLoginLocal
+    )
+// Matches with '/api/login/refresh/'
+router.route('/refresh/')
+    .get(loginController.refreshToken)
+
+// Matches with '/api/login/reset/'
+router.route('/reset/')
+    .all(loginController.sendResetEmail)
+
+// Matches with '/api/login/reset/:token'
+router.route('/reset/:token')
+    .post(loginController.resetPassword)
+
+// Matches with '/api/login/new/'
+router.route('/new/')
+    .post(loginController.newUserAccount)
+// Matches with '/api/login/old/'
+
+router.route("/old/")
+    .get((request, response) => {
+        if(request.session.user){
+        usersController.findMePrivate(request.session.user.email).then(result => {
+            console.log(result);
+            const data = {};
+            data.token = request.session.token;
+            if(result.email){
+                data.user = result;
+            }
+            console.log(data);
+            response.send(data);
+        }).catch(error => {
+            console.log(error);
+        })
+        } else {
+            response.status(401).json({message:"Please log in."});
+        }
+    })
     .post((request, response) => {
         console.log(request.body);
         const email = request.body.email;
         const name = request.body.name;
         // make sure what was sent is a vaild email address
         if(!email || !name){
-            response.status(403);
-            response.send({
+            response.status(403).json({
                 message: "Bad request.",
             })
         }
@@ -125,31 +140,26 @@ router.route("/validate")
     .post((request, response) => {
         const token = request.body.token;
         if (!token) {
-            response.status(403)
-            response.send("Can't verify user.")
+            response.status(403).send("Can't verify user.")
             return
         }
         let decoded
         try {
             decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
         } catch {
-            response.status(403)
-            response.send("Invalid auth credentials.")
+            response.status(403).send("Invalid auth credentials.")
             return
         }
         if (!decoded.hasOwnProperty("email") || !decoded.hasOwnProperty("expirationDate")) {
-            response.status(403)
-            response.send("Invalid auth credentials.")
+            response.status(403).send("Invalid auth credentials.")
             return
         }
         const { expirationDate } = decoded
         if (expirationDate < new Date()) {
-            res.status(403)
-            res.send("Token has expired.")
+            res.status(403).send("Token has expired.")
             return
         }
-        response.status(200)
-        response.send("User has been validated.")
+        response.status(200).send("User has been validated.")
     });
 
 module.exports = router;

@@ -1,4 +1,8 @@
-const router = require("express").Router();
+const router = require('express').Router();
+const passport = require('passport');
+
+const withAuth = passport.authenticate('jwt', { session: false });
+
 // require routes files
 const loginRoutes = require("./login");
 const logoutRoute = require("./logout");
@@ -9,8 +13,10 @@ const gameRoutes = require('./game');
 // use routes
 router.use("/login", loginRoutes);
 router.use("/logout", logoutRoute);
-router.use("/users", usersRoutes);
-router.use("/cards", cardsRoutes);
-router.use("/game", gameRoutes);
+
+// protected routes
+router.use("/users", withAuth, usersRoutes);
+router.use("/cards", withAuth, cardsRoutes);
+router.use("/game", withAuth, gameRoutes);
 
 module.exports = router;

@@ -1,84 +1,41 @@
 const { User } = require("../models");
+const isEqual = require('lodash.isequal');
 
 module.exports = {
     findAll: function (request, response){
-        if(!request.session.token) response.status(401).send();
-        User
-            .find({})
+        User.find({}, '-email -created -__v -password')
             .then(dbModel => {
                 response.json(dbModel)
             })
             .catch(error => response.status(422).json(error));
     },
-    findByEmail: function(request, response){
-        if(!request.session.token || !request.session.email) response.status(401).send();
-        if(request.body.token !== request.session.token) response.status(401).send();
-        User
-            .find({email: request.body.email})
-            .then(dbModel => {
-                response.json(dbModel)
-            })
-            .catch(error => response.status(422).json(error));
-    },
-    findMe: function(request, response){
-        console.log("session");
-        console.log(request.session.token);
-        if(!request.session.token || !request.session.email){
-            response.status(401).send();
-            return;
-        } 
-        User
-            .find({email: request.session.email})
+    findById: function(request, response){
+        User.findOne({_id: request.params.id}, '-email -created -__v -password')
             .then(user => {
-                response.json(user);
-            })
-            .catch(error => response.status(422).json(error));
-    },
-    findMePrivate: function(email){
-        return User
-            .findOne({email: email})
-            .then(user => {
-                return user;
+                if(user){
+                    response.json(user);
+                } else {
+                    response.status(404).json("User not found");
+                }
             })
             .catch(error => {
-                console.log(error)
-            });
+                response.status(400).send("Bad request");
+        })
     },
     update: function (request, response) {
-        if(!request.session.token) response.status(401).send();
-        console.log("updating");
-        console.log(request.body);
-        User
-            .updateOne({ _id: request.body.id }, request.body)
-            .then(dbModel => response.json(dbModel))
-            .catch(error => response.status(422).json(error));
-    },
-    create: function (request, response) {
-        if(!request.session.token) response.status(401).send();
-        console.log(request.body);
-        if(request.session.email){
-            const newUser = {
-                firstName: request.body.firstName,
-                lastName: request.body.lastName,
-                color: request.body.color,
-                displayName: request.body.displayName,
-                email: request.session.email
-            }
-            User
-                .create(newUser)
-                .then(dbModel => response.json(dbModel))
-                .catch(error => response.status(422).json(error));
-        } else {
-            response.status(422).json({message:"no email available"});
-        }
-        
-    },
-    createPrivate: function (user) {
-        return User
-            .create(user)
+        User.findOne({ _id: request.params.id })
             .then(user => {
-                return user;
+                console.log(request.user._id);
+                console.log(user._id);
+                console.log(isEqual(user._id, request.user._id));
+                if(request.user.role === 'admin' || isEqual(user._id, request.user._id)){
+                    User.updateOne({_id: request.params.id}, request.body)
+                        .then(dbResult => response.json(dbResult))
+                        .catch(error => response.status(422).json(error))
+                } else {
+                    response.status(403).send("Unauthorize");
+                }
             })
-            .catch(error => console.log(error));
+            .catch(error => response.status(422).json(error));
     }
 }

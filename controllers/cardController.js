@@ -1,73 +1,107 @@
 const { Card } = require("../models");
-//var ObjectId = require('mongoose').Types.ObjectId; 
+const isEqual = require('lodash.isequal');
+
 const { generateCard } = require("../utils/CardGenerator");
 
 module.exports = {
-    findCardsByPlayerID: function (request, response) {
-        if(!request.session.user) response.status(401).send();
-        //if(!request.body.id) response.status(400).send();
-        Card
-            .find({player: request.session.user.uuid, active: true}).then(cards => {
-                //console.log(request.session.user.uuid);
-                //console.log(cards);
-                response.json(cards);
+    // start implementing jwt based authentication
+    getCards: function(request, response) {
+        const findQuery = {}
+        if(request.query){
+            if(request.query.player){
+                findQuery.player = request.query.player;
+            }
+            if(!request.query.includeInactive){
+                findQuery.active = true;
+            }
+        }
+        console.log(findQuery);
+        Card.find(findQuery)
+            .populate({
+                path: 'player',
+                select: '-email -password -created -__v', 
+                model: 'User'
+            })
+            .then(cards => {
+                if(cards){
+                    response.json(cards);
+                } else {
+                    response.status(404).send("no cards found matching request");
+                }
+            })
+            .catch(error => response.status(422).json(error));
+    },
+    findCardById: function(request, response) {
+        Card.findOne({_id: request.params.id})
+            .populate({
+                path: 'player',
+                select: '-email -password -created -__v', 
+                model: 'User'
+            })
+            .then(card => {
+                if(card){
+                    response.json(card);
+                } else {
+                    response.status(404).send("no card found")
+                }
             })
             .catch(error => response.status(422).json(error));
     },
     newCard: function(request, response){
-        if(!request.session.user) response.status(401).send();
-        const newCard = generateCard(request.session.user.uuid);
-        newCard.player = request.session.user.uuid;
-        console.log(newCard);
+        const newCard = generateCard(request.user._id);
+        newCard.player = request.user._id;
         Card
-            .create(newCard)
-            .then(dbModel => {
-                console.log('success');
-                Card
-                    .find({player: request.session.user.uuid, active: true}).then(cards => {
-                        //console.log(request.session.user.uuid);
-                        //console.log(cards);
-                        response.json(cards);
+            .create(newCard).then(card => {
+               if(card){
+                    Card.populate(card, {
+                        path: 'player',
+                        select: '-email -password -created -__v', 
+                        model: 'User'
+                    }, function(error, card){
+                        if(error){
+                            response.status(422).json(error);
+                        } else if(!card){
+                            response.status(422).json(card);
+                        } else {
+                            response.json(card);
+                        }
                     })
-                    .catch(error => response.status(422).json(error));
+               } else {
+                   response.status(400).json("No new card created")
+               }
             })
             .catch(error => {
                 console.log(error);
                 response.status(422).json(error)
             });
-
     },
-    deactivateCard: function(request, response){
-        if(!request.session.user) response.status(401).send();
-        const cardUUID = request.params.uuid;
-        console.log(cardUUID);
+    activateCard: function(request, response){
+        if(typeof request.body.active === undefined || typeof request.body.active === 'boolean'){
+            response.status(400).json('bad request');
+        }
         Card
-            .findOne({uuid: cardUUID})
+            .findOne({_id: request.params.id})
             .then(card => {
-                console.log(46);
-                console.log(card);
-                if(card && card.player === request.session.user.uuid){
-                    card.active = false;
-                    Card
-                        .updateOne({uuid: card.uuid}, card)
-                        .then(dbModel => {
-                            Card
-                                .find({player: request.session.user.uuid, active: true}).then(cards => {
-                                    //console.log(request.session.user.uuid);
-                                    //console.log(cards);
-                                    response.json(cards);
-                                })
-                                .catch(error => {
-                                    console.log(error);
-                                    response.status(422).json(error)
-                                });
+                if(card && (request.user.role === 'admin' || isEqual(card.player._id, request.user._id))){
+                    card.active = request.body.active;
+                    card.save().then(updatedCard => {
+                        Card.populate(updatedCard, {
+                            path: 'player',
+                            select: '-email -password -created -__v', 
+                            model: 'User'
+                        }, function(error, card){
+                            if(error){
+                                response.status(422).json(error);
+                            } else if(!card){
+                                response.status(422).json(card);
+                            } else {
+                                response.json(card);
+                            }
                         })
-                        .catch(error => {
-                            console.log(error);
-                            response.status(422).json(error)
-                        })
+                    })
+                    .catch(error => response.status(422).json(error));
                 } else {
-                    response.status(400).json({message:"bad request"});
+                    response.status(400).send("bad request");
                 }
             })
             .catch(error =>{

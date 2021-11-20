@@ -1,20 +1,22 @@
 require('dotenv').config();
-const express = require("express");
+const express = require('express');
 const session = require('express-session');
 const compression = require('compression');
-const path = require("path");
+const flash = require('connect-flash');
+//const path = require("path");
 //const { Server } = require("socket.io");
 
-const mongoose = require("mongoose");
-const routes = require("./routes");
-const cors = require("cors");
+const mongoose = require('mongoose');
+const routes = require('./routes');
+const cors = require('cors');
+const passport = require('passport');
 //const { createServer } = require('http');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 const PORT = process.env.PORT || 3001;
 const app = express();
 
-const server = require("http").createServer(app);
+const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
 // Define Session Store
@@ -28,6 +30,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(compression());
+app.use(flash());
 
 if (process.env.NODE_ENV === 'development') {
   // app.set('trust proxy', 1) // trust first proxy
@@ -51,7 +54,14 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
 }
 
+//Add passport for authentication
+app.use(passport.initialize());
+app.use(passport.session());
 
+// define strategy and use it
+const configurePassport = require('./middleware/passportConf');
+//passport.use(strategy);
+configurePassport(passport);
 
 // Connect to the Mongo DB
 mongoose.connect(
