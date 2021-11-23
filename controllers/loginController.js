@@ -1,5 +1,5 @@
 const { User } = require("../models");
-//const passport = require('passport');
+const cardController = require("./cardController");
 const jwt = require('jsonwebtoken');
 const nodeMailer = require("nodemailer");
 const generateEmail = require('../utils/EmailGenerator');
@@ -178,8 +178,18 @@ module.exports = {
                 if(!dbResult){
                     User.create(request.body).then(user => {
                         if(user){
-                            const token = makeToken(user.email, 1);
-                            response.status(200).json({token: token});
+                            // create 3 new cards for this user
+                            cardController.createMany(user._id, 3).then(cards => {
+                                const token = makeToken(user.email, 1);
+                                if(!cards){
+                                    console.log('no cards created');
+                                }
+                                response.status(200).json({token: token});
+                            })
+                            .catch(error => {
+                                console.log(error);
+                                response.status(422).json(error);
+                            })                            
                         } else {
                             response.status(400).send("error creating user");
                         }
