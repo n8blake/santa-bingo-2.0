@@ -22,6 +22,7 @@ const USERS = [
           firstName: "Nate",
           lastName: "Blake",
           password: "password",
+          role: "admin",
           displayName: "N8",
           email: "n8blake@mac.com",
           color: 'red'
