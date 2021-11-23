@@ -8,7 +8,8 @@ const loginRoutes = require("./login");
 const logoutRoute = require("./logout");
 const usersRoutes = require("./users");
 const cardsRoutes = require("./cards");
-const gameRoutes = require('./game');
+const gameRoomRoutes = require("./gamerooms");
+//const gameRoutes = require('./game');
 
 // use routes
 router.use("/login", loginRoutes);
@@ -17,6 +18,7 @@ router.use("/logout", logoutRoute);
 // protected routes
 router.use("/users", withAuth, usersRoutes);
 router.use("/cards", withAuth, cardsRoutes);
-router.use("/game", withAuth, gameRoutes);
+router.use("/gamerooms", withAuth, gameRoomRoutes);
+//router.use("/game", withAuth, gameRoutes);
 
 module.exports = router;
