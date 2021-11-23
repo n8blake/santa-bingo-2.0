@@ -1,9 +1,12 @@
 module.exports = {
-    Game: require("./game.js"),
     Card: require("./card.js"),
-    User: require("./user.js"),
+    Game: require("./game.js"),
     GameRoom: require("./gameroom.js"),
     GameType: require("./gametype.js"),
-    // PlayerMark: require("./playerMark.js"), 
-    // Win: require("./Win.js")
+    GameSettings: require("./gamesettings.js"), 
+    PlayerMark: require("./playermark.js"), 
+    Prize: require("./prize.js"),
+    StagedCards: require("./stagedcards.js"),
+    User: require("./user.js"),
+    Win: require("./win.js")
 };
