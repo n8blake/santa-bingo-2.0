@@ -5,7 +5,7 @@ const usersController = require("../../controllers/usersController");
 router.route('/')
     .get(usersController.findAll)
 
-// Match with '/api/users/me/'
+// Match with '/api/users/:id'
 router.route("/:id")
     .get(usersController.findById)
     .patch(usersController.update)
