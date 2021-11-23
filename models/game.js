@@ -3,12 +3,6 @@ const Schema = mongoose.Schema;
 const Model = mongoose.model;
 const { v4: uuidv4 } = require('uuid');
 
-const GameTypeSubSchema = new Schema({
-    gameType: { type: Schema.Types.ObjectId, required:true, ref: 'GameType'},
-    start_time: { type: Date, required: true, default: new Date()},
-    end_time: { type: Date }
-});
-
 const CalledNumberSubSchema = new Schema({
     number: { type: Number, required: true },
     timestamp: { type: Date, required: true, default: new Date()}
@@ -30,11 +24,7 @@ const GameSchema = new Schema({
     creator: { type: Schema.Types.ObjectId, required:true, ref: 'User' },
     name: { type: String },
     code: { type: String },
-    numberOfCardsAllowed: { type: Number, required: true, default: 3 },
-    gameTypeHistory: { type: Array, of: GameTypeSubSchema },
-    freeSpaceAllowed: {type: Boolean, required: true, default: true},
-    gameManagers: { type: Array },
-    prizeManagers: { type: Array },
+    gameSettings: { type: Schema.Types.ObjectId, required: true, ref: 'GameSettingsSchema'},
     players: { type: Array, of: PlayerSubSchema }
 });
 
