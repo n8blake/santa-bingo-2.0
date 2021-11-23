@@ -23,7 +23,7 @@ module.exports = {
                 model: 'User'
             })
             .then(cards => {
-                if(cards){
+                if(cards && cards.length > 0){
                     response.json(cards);
                 } else {
                     response.status(404).send("no cards found matching request");
@@ -49,7 +49,7 @@ module.exports = {
     },
     newCard: function(request, response){
         const newCard = generateCard(request.user._id);
-        newCard.player = request.user._id;
+        //newCard.player = request.user._id;
         Card
             .create(newCard).then(card => {
                if(card){
@@ -108,6 +108,14 @@ module.exports = {
                 console.log(error);
                 response.status(422).json(error);
             });
+    },
+    createMany: async function(userId, cardCount) {
+        // create 3 cards
+        const cards = [];
+        for(let i = 0; i < cardCount; i++){
+            cards.push(generateCard(userId));
+        }
+        return Card.insertMany(cards);
     }
 
 }
