@@ -10,4 +10,10 @@ router.route('/:id')
     .get(gameController.findById)
     .patch(gameController.update)
 
+router.route('/:id/end/')
+    .put(gameController.endGame)
+
+router.route('/:id/nextnumber/')
+    .get(gameController.callNextNumber)
+
 module.exports = router;
