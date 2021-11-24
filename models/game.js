@@ -22,7 +22,7 @@ const GameSchema = new Schema({
     creator: { type: Schema.Types.ObjectId, required:true, ref: 'User' },
     name: { type: String },
     code: { type: String },
-    settings: { type: Schema.Types.ObjectId, required: true, ref: 'GameSettingsSchema'},
+    settings: { type: Schema.Types.ObjectId, required: true, ref: 'GameSettings'},
     players: { type: Array, of: PlayerSubSchema }
 });
 
