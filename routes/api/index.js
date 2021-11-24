@@ -11,6 +11,7 @@ const cardsRoutes = require("./cards");
 const gameRoomRoutes = require("./gamerooms");
 const stagedCardsRoutes = require("./stagedcards");
 const gameRoutes = require('./game');
+const marksRoutes = require('./marks')
 
 // use routes
 router.use("/login", loginRoutes);
@@ -22,5 +23,6 @@ router.use("/cards", withAuth, cardsRoutes);
 router.use("/gamerooms", withAuth, gameRoomRoutes);
 router.use("/stagedcards", withAuth, stagedCardsRoutes);
 router.use("/game", withAuth, gameRoutes);
+router.use("/marks", withAuth, marksRoutes);
 
 module.exports = router;
