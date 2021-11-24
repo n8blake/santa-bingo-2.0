@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Model = mongoose.model;
 
-const PlayerMarkSchema = new Schema({
+const MarkSchema = new Schema({
     player: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
     card: { type: Schema.Types.ObjectId, required: true, ref: 'Card' },
     game: { type: Schema.Types.ObjectId, required: true, ref: 'Game' },
@@ -12,6 +12,6 @@ const PlayerMarkSchema = new Schema({
     timestamp: { type: Date, required: true, default: new Date()}
 });
 
-const PlayerMark = Model("PlayerMark", PlayerMarkSchema);
+const Mark = Model("Mark", MarkSchema);
 
-module.exports = PlayerMark;
+module.exports = Mark;
