@@ -19,7 +19,7 @@ const winDataSubschema = {
 const WinSchema = new Schema({
     player: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
     card: { type: Schema.Types.ObjectId, required: true, ref: 'Card' },
-    marks: [{ type: Schema.Types.ObjectId, required: true, ref: 'PlayerMark' }], 
+    marks: [{ type: Schema.Types.ObjectId, required: true, ref: 'Mark' }], 
     game: { type: Schema.Types.ObjectId, required: true, ref: 'Game' },
     timestamp: { type: Date, required: true, default: new Date()}
 });
