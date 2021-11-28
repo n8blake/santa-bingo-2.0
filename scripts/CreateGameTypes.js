@@ -7,6 +7,7 @@ const createGameTypes = async function() {
             const gameTypes = [
                 { 
                     type: 'bingo',
+                    numberOfMarks: 5,
                     columns: [0, 1, 2, 3, 4],
                     rows: [0, 1, 2, 3, 4],
                     diagonals: [0, 1], 
@@ -14,6 +15,7 @@ const createGameTypes = async function() {
                 },
                 { 
                     type: 'x',
+                    numberOfMarks: 9,
                     columns: [],
                     rows: [],
                     diagonals: [0, 1], 
@@ -21,6 +23,7 @@ const createGameTypes = async function() {
                 },
                 { 
                     type: 'window',
+                    numberOfMarks: 16, 
                     columns: [0, 4],
                     rows: [0, 4],
                     diagonals: [], 
@@ -28,6 +31,7 @@ const createGameTypes = async function() {
                 },
                 { 
                     type: 'blackout',
+                    numberOfMarks: 25,
                     columns: [0, 1, 2, 3, 4],
                     rows: [0, 1, 2, 3, 4],
                     diagonals: [0, 1], 
