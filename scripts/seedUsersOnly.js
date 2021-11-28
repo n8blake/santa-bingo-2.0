@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { User, Card, Game, GameRoom, GameSettings, StagedCards, PlayerMark, Prize, } = require("../models");
+const { User, Card, Game, GameRoom, GameSettings, StagedCards, Mark, Prize, } = require("../models");
 
 mongoose.connect(
     process.env.MONGODB_URI ||
