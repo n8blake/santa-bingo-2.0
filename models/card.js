@@ -15,6 +15,26 @@ const CardSchema = new Schema({
     uuid: { type: String, required: true, default: uuidv4, index: { unique: true }},
 });
 
+CardSchema.methods.getRow = function(rowIndex){
+    const row = [];
+    for(let i = 0; i < 5; i++){
+        row.push(this[`column_${i}`][rowIndex]);
+    }
+    return row;
+}
+
+CardSchema.methods.getDiagonal = function(diagIndex){
+    const diag = [];
+    for(let i = 0; i < 5; i++){
+        if(diagIndex === 0){
+            diag.push(this[`column_${i}`][i]);
+        } else {
+            diag.push(this[`column_${i}`][4 - i]);
+        }
+    }
+    return diag;
+}
+
 const Card = Model("Card", CardSchema);
 
 module.exports = Card;
