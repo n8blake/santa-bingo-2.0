@@ -14,9 +14,17 @@ module.exports = {
             if(request.query.card){
                 findQuery.card = request.query.card;
             }
+            
             Mark.find(findQuery).then(marks => {
                 if(marks && marks.length > 0){
-                    response.json(marks);
+                    if(request.query.idsOnly){
+                        const _marks = marks.map(mark => {
+                            return mark._id
+                        });
+                        response.json(_marks);
+                    } else {
+                        response.json(marks);
+                    }
                 } else {
                     response.status(404).send('No marks found');
                 }
@@ -38,18 +46,18 @@ module.exports = {
                                     // player in game
                                     let playerInGame = false;
                                     let cardInGame = false;
-                                    console.log(game.players);
+                                    //console.log(game.players);
                                     for(let i = 0; i < game.players.length; i++){
                                         //console.log(game.players[i].player.toString())
                                         //console.log(request.user._id)
                                         if(isEqual(game.players[i].player, request.user._id)){
-                                            console.log('player indeed in game');
+                                            //console.log('player indeed in game');
                                             playerInGame = true;
                                         }
                                         if(playerInGame){
                                             //console.log(game.players[i].cards)
                                             for(let j = 0; j < game.players[i].cards.length; j++){
-                                                console.log(game.players[i].cards[j]);
+                                                //console.log(game.players[i].cards[j]);
                                                 if(game.players[i].cards[j].toString() === request.body.card){
                                                     cardInGame = true;
                                                 }
@@ -63,18 +71,29 @@ module.exports = {
                                             newMark.player = request.body.player;
                                             newMark.card = request.body.card;
                                             newMark.number = request.body.number;
+                                            // console.log(card);
+                                            // console.log(newMark.number);
                                             for(let i = 0; i < 5; i ++) {
                                                 const rowIndex = card[`column_${i}`].indexOf(newMark.number);
+                                                // console.log(`${rowIndex} : row index`);
+                                                // console.log(rowIndex > -1);
                                                 if(rowIndex > -1){
                                                     newMark.row = rowIndex;
                                                     newMark.column = i;
+                                                } else if(!newMark.row && !newMark.column) {
+                                                    newMark.row = -1;
+                                                    newMark.column = -1;
                                                 }
                                             }
-                                            if(newMark.row && newMark.column){
+                                            //console.log(newMark);
+                                            if(newMark.row > -1 && newMark.column > -1){
                                                 Mark.create(newMark).then(mark => {
                                                     response.json(mark);
                                                 })
-                                                .catch(error => response.status(422).json(error))
+                                                .catch(error => {
+                                                    console.log(error);    
+                                                    response.status(422).json(error)
+                                                })
                                             } else {
                                                 response.status(400).send('Number not on card');
                                             }
