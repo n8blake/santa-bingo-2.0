@@ -215,7 +215,7 @@ module.exports = {
                 if(user){
                     response.json(true);
                 } else {
-                    response.json(false);
+                    response.status(404).json(false);
                 }
             })
             .catch(error => {
