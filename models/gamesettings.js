@@ -8,6 +8,8 @@ const GameTypeSubSchema = new Schema({
     end_time: { type: Date }
 });
 
+mongoose.model('GameTypesHistoryItem', GameTypeSubSchema);
+
 const ManagerSubSchema = new Schema({
     manager: { type: Schema.Types.ObjectId, required: true, ref: 'User'},
     added: { type: Date, required: true, default: new Date()},
@@ -17,7 +19,8 @@ const ManagerSubSchema = new Schema({
 const GameSettingsSchema = new Schema({
     gameManagers: { type: Array, of: ManagerSubSchema },
     prizeManagers: { type: Array, of: ManagerSubSchema },
-    gameTypeHistory: { type: Array, of: GameTypeSubSchema, required: true },
+    currentGameType: { type: Schema.Types.ObjectId, required:true, ref: 'GameType'},
+    gameTypeHistory: { type: Array, of: GameTypeSubSchema, required: true, ref: 'GameTypesHistoryItem'},
     freeSpaceAllowed: {type: Boolean, required: true, default: true},
     numberOfCardsAllowed: { type: Number, required: true, default: 3 },
 });
