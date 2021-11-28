@@ -5,6 +5,7 @@ const Model = mongoose.model;
 const GameTypeSchema = new Schema({
     type: { type: String, required: true, default: 'bingo'},
     // define win conditions
+    numberOfMarks: { type: Number, required: true, default: 5},
     columns: {type: Array, of: Number },
     rows: {type: Array, of: Number },
     diagonals: {type: Array, of: Number },
