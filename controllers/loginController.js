@@ -208,5 +208,20 @@ module.exports = {
             })
         }
         
+    },
+    checkForAccount: function(request, response){
+        if(request.body.email){
+            User.findOne({email: request.body.email}).then(user => {
+                if(user){
+                    response.json(true);
+                } else {
+                    response.json(false);
+                }
+            })
+            .catch(error => {
+                console.log(error)
+                response.json(error.message);
+            })
+        }
     }
 }
