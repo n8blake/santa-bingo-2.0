@@ -1,0 +1,74 @@
+@import '../../theme-colors.scss';
+
+.jumbotron {
+	position: relative;
+	margin: auto;
+	margin-top: 0pt;
+	margin-bottom: 10pt;
+	padding-top: 10pt;
+	padding-bottom: 0pt;
+	margin-bottom: 0pt;
+	text-align: center;
+}
+
+.pageLinkBtn {
+	position: absolute;
+	top: 20pt;
+	right: 30pt;
+	font-size: 18pt;
+	opacity: .25;
+	transition: opacity .25s;
+}
+
+.link-text {
+	margin-top: -2pt;
+	opacity: 0;
+	font-size: 12pt;
+	font-style: italic;
+	text-decoration: none !important;
+	transition: opacity .25s;
+}
+
+.pageLinkBtn:hover {
+	opacity: 1;
+
+	.link-text {
+		opacity: 1;
+	}
+}
+
+.hero-text {
+	font-family: bely-display, garamond, serif;
+	font-weight: 700;
+	font-size: 48pt;
+}
+
+.hero-subtitle {
+	font-family: bely, garamond, serif;
+	font-weight: 100;
+	font-style: italic;
+	font-size: 12pt;
+	margin-top: -12pt;
+	margin-bottom: 0;
+	padding: 0pt;
+}
+
+.logoHero {
+	max-width:40%;
+	max-height:40%;
+	width: 300px;
+	height: 75px;
+	cursor: pointer;
+}
+
+@media only screen and (max-width: 375px) {
+    .hero-text {
+		font-family: ivypresto-display, garamond, serif;
+		font-weight: 700;
+        font-size: 22pt;
+    }
+	.hero-subtitle {
+		margin-top: -6pt;
+		font-size: 10pt;
+	}
+}
