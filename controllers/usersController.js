@@ -25,13 +25,13 @@ module.exports = {
     update: function (request, response) {
         User.findOne({ _id: request.params.id })
             .then(user => {
-                console.log(request.user._id);
-                console.log(user._id);
-                console.log(isEqual(user._id, request.user._id));
+                // console.log(request.user._id);
+                // console.log(user._id);
+                // console.log(isEqual(user._id, request.user._id));
                 if(request.user.role === 'admin' || isEqual(user._id, request.user._id)){
                     User.updateOne({_id: request.params.id}, request.body)
                         .then(dbResult => response.json(dbResult))
-                        .catch(error => response.status(422).json(error))
+                        .catch(error => response.status(422).json(error.message))
                 } else {
                     response.status(403).send("Unauthorize");
                 }

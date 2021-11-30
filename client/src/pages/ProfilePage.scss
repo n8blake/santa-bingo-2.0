@@ -41,7 +41,8 @@
     width: 48pt;
     height: 48pt;
     border-radius: 10rem;
-    margin: 10pt;   
+    margin: 10pt;  
+    cursor: pointer; 
 }
 
 .profile-color-choice-selected {
@@ -49,7 +50,7 @@
 }
 
 .profile-color-red {
-    background-color: $secondary;
+    background-color: $red;
 }
 
 .profile-color-green {

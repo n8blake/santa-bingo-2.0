@@ -21,8 +21,16 @@ module.exports = {
                 if (expirationDateObject < new Date()) {
                     response.status(403).send("Token has expired. Login again.");
                 } else {
-                    const token = makeToken(decoded.email, 1);
-                    response.status(200).json({token:token});
+                    User.findOne({email: decoded.email}, '-email -created -__v -password')
+                        .then(user => {
+                            const token = makeToken(decoded.email, 1);
+                            response.status(200).json({token, user});
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            response.status(422).json(error.messsage);
+                        })
+                    
                 }
 
             } catch (error) {
@@ -36,8 +44,17 @@ module.exports = {
     defaultLoginLocal: function(request, response){
         console.log(request.user.email);
         request.session.user = request.user;
-        const token = makeToken(request.user.email, 1);
-        response.status(200).json({token:token});
+        const refreshToken = makeToken(request.user.email, 24 * 7); // Refresh token can stay in session for 1 week -- same as session length
+        request.session.refreshToken = refreshToken;
+        User.findOne({email: request.user.email}, '-email -created -__v -password')
+            .then(user => {
+                const token = makeToken(request.user.email, 1);
+                response.status(200).json({token, user});
+            })
+            .catch(error => {
+                console.log(error);
+                response.status(422).json(error.messsage);
+            })
     },
     refreshToken: function(request, response) {
         if(request.headers.token){
@@ -53,8 +70,15 @@ module.exports = {
                 } else {
                     const refreshToken = makeToken(decoded.email, 24 * 7); // Refresh token can stay in session for 1 week -- same as session length
                     request.session.refreshToken = refreshToken;
-                    const token = makeToken(request.user.email, 1);
-                    response.status(200).json({token:token});
+                    User.findOne({email: decoded.email}, '-email -created -__v -password')
+                        .then(user => {
+                            const token = makeToken(decoded.email, 1);
+                            response.status(200).json({token, user});
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            response.status(422).json(error.messsage);
+                        })
                 }
             } catch (error) {
                 console.log(error);
@@ -184,7 +208,15 @@ module.exports = {
                                 if(!cards){
                                     console.log('no cards created');
                                 }
-                                response.status(200).json({token: token});
+                                User.findOne({email: request.body.email}, '-email -created -__v -password')
+                                    .then(user => {
+                                        const token = makeToken(request.body.email, 1);
+                                        response.status(200).json({token, user});
+                                    })
+                                    .catch(error => {
+                                        console.log(error);
+                                        response.status(422).json(error.messsage);
+                                    })
                             })
                             .catch(error => {
                                 console.log(error);
