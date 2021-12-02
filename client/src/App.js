@@ -8,9 +8,10 @@ import Home from './pages/Home';
 import Header from './components/Header/Header'
 import ProfilePage from "./pages/ProfilePage";
 import NoMatch from "./pages/NoMatch";
-import NewGamePage from "./pages/NewGame";
-import GamePage from "./pages/GamePage";
+import NewGameRoomPage from "./pages/NewGameRoom";
+import GameRoomPage from "./pages/GameRoomPage";
 import CardManagerPage from "./pages/CardManagerPage";
+import PrintCardPage from "./pages/PrintCardPage";
 
 import './App.scss';
 
@@ -27,10 +28,11 @@ function App() {
         <Route exact path={"/"} children={<Home />} />
         <Route exact path={"/profile"} children={<ProfilePage />}/>
         <Route exact path={"/cards"} children={<CardManagerPage />}/>
-        <Route exact stict path={`/game/:uuid`} >
-            <GamePage />
+        <Route exact path={"/card/print/:id"} children={<PrintCardPage />}/>
+        <Route exact stict path={`/gameroom/:id`} >
+            <GameRoomPage />
         </Route> 
-        <Route exact stict path={"/newgame/"} children={<NewGamePage />}/>
+        <Route exact stict path={"/newgame/"} children={<NewGameRoomPage />}/>
         <Route>
           <NoMatch />
         </Route>
