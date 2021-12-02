@@ -6,7 +6,6 @@ import API from "../utils/API";
 import useDebounce from "../utils/debounceHook";
 import "./LoginPage.scss";
 import snowflake from '../assets/SVG/snowflake_white.svg';
-import santa from '../assets/SVG/santa_white.svg';
 
 function LoginPage(props) {
     const [state, dispatch] = useStoreContext();
