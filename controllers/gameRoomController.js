@@ -1,19 +1,27 @@
 const { GameRoom, GameSettings, GameType, Card, StagedCards } = require('../models');
 const isEqual = require('lodash.isequal');
+const addPlayerToRoom = require('../utils/addPlayerToRoom');
 
 module.exports = {
     find: function(request, response){
         const findQuery = {
-            public: true
+            active: true
         }
-        if(request.query){
-            if(request.query.creator){
+        if(request.body){
+            if(request.body.creator){
                 findQuery.creator  = request.query.creator
             }
-            if(request.query.player){
-                findQuery.players = request.query.player;
+            if(request.body.players){
+                //console.log(request.body.players);
+                findQuery.players = { $in: request.body.players};
             }
+            if(request.body.notPlayers){
+                findQuery.players = { $nin: request.body.notPlayers};
+            }
+        } else {
+            findQuery.public = true;
         }
+        //console.log(findQuery);
         GameRoom.find(findQuery)
             .populate({
                 path: 'players',
@@ -61,7 +69,8 @@ module.exports = {
                 }
             })
             .catch(error => {
-                response.status(422).json(error);
+                console.log(error);
+                response.status(422).json(error.message);
             })
     },
     findById: function(request, response){
@@ -125,6 +134,7 @@ module.exports = {
 
         // set gameroom settings
         const defaultGameSettings = {
+            currentGameType: bingoGameType._id,
             gameManagers: [{manager: request.user._id}],
             prizeManagers: [{manager: request.user._id}],
             gameTypeHistory: [{gameType: bingoGameType._id}]
@@ -133,17 +143,21 @@ module.exports = {
         const settings = await GameSettings.create(defaultGameSettings);
         if(settings._id){
             request.body.settings = settings._id;
-            request.body.players = [request.user._id];
+            //request.body.players = [request.user._id];
         } else {
             reponse.status(400).send('default game settings not set');
         }
 
         GameRoom.create(request.body)
             .then(dbModel => {
-                response.json(dbModel);
+                //console.log(dbModel);
+                addPlayerToRoom(dbModel._id, request.user._id).then(result => {
+                    response.json(dbModel);
+                })
             })
             .catch(error => {
-                response.status(422).json(error);
+                console.log(error);
+                response.status(422).json(error.message);
             })
     },
     update: function(request, response){
@@ -152,7 +166,9 @@ module.exports = {
                 if(request.user.role === 'admin' || isEqual(gameroom.creator, request.user._id)){
                     GameRoom.updateOne({_id: request.params.id}, request.body)
                         .then(dbResult => response.json(dbResult))
-                        .catch(error => response.status(422).json(error));
+                        .catch(error => {
+                            console.log(error);
+                            response.status(422).json(error.message)});
                 } else {
                     response.status(403).send('You are not permitted to modify this resource.');
                 }
@@ -165,67 +181,74 @@ module.exports = {
         const gameRoomId = request.params.gameRoomId;
         const userId = request.params.userId;
         console.log(gameRoomId);
-        GameRoom.findOne({_id: gameRoomId}).populate('settings').then(room => {
-            if(room){
-                if(room.players.indexOf(userId) === -1){
-                    room.players.push(userId);
-                } 
-                const cardsAllowed = room.settings.numberOfCardsAllowed;
-                room.save().then(dbSave => {
-                    // Stage cards
-                    StagedCards.findOne({player: userId, gameRoom: room._id}).then(stagedCards => {
-                        // console.log(cardsAllowed);
-                        // console.log(stagedCards);
-
-                        if(stagedCards && isEqual(stagedCards.gameRoom, room._id) && stagedCards.cards && (stagedCards.cards.length === cardsAllowed)){
-                            //console.log(stagedCards);
-                            response.send('player already added. cards already staged');
-                        } else {
-                            Card.find({player: userId, active: true}).sort({'created': -1}).limit(cardsAllowed)
-                                .then(cards => {
-                                    if(cards.length < cardsAllowed){
-                                        // create new cards to make up 
-                                        console.log('creating new cards');
-                                        const newCardsArray = [];
-                                        const newCardsNeeded = cardsAllowed - cards.length;
-                                        for(let i = 0; i < newCardsNeeded; i++){
-                                            const newCardCreationObj = Card.create({player: user._id});
-                                            newCardsArray.push(newCardCreationObj);
-                                        }
-                                        Promise.all(newCardsArray).then(() => {
-                                            const stagedCards = {};
-                                            stagedCards.gameRoom = room._id;
-                                            stagedCards.player = userId;
-                                            stagedCards.cards = cards.map(card => {
-                                                return card._id;
-                                            });
-                                            StagedCards.create(stagedCards).then(() => {
-                                                response.send('User added to room. Cards staged.');
-                                            }).catch(error => response.status(422).json(error));
-                                        })
-                                    } else {
-                                        const stagedCards = {};
-                                        stagedCards.gameRoom = room._id;
-                                        stagedCards.player = userId;
-                                        stagedCards.cards = cards.map(card => {
-                                            return card._id;
-                                        });
-                                        StagedCards.create(stagedCards).then(createdStagedCards => {
-                                            response.send('User added to room. Cards staged.');
-                                        }).catch(error => response.status(422).json(error));
-                                    }
-
-                                })
-                        }
-                    })
-                })
-                .catch(error => response.status(422).json(error));
-                
-            } else {
-                response.status(404).send('room not found');
-            }
+        addPlayerToRoom(gameRoomId, userId).then(result => {
+            response.json(result);
         })
-        .catch(error => response.status(422).json(error));
+        .catch(error => {
+            console.log(error);
+            reponse.status(422).json(error.message);
+        })
+        // GameRoom.findOne({_id: gameRoomId}).populate('settings').then(room => {
+        //     if(room){
+        //         if(room.players.indexOf(userId) === -1){
+        //             room.players.push(userId);
+        //         } 
+        //         const cardsAllowed = room.settings.numberOfCardsAllowed;
+        //         room.save().then(dbSave => {
+        //             // Stage cards
+        //             StagedCards.findOne({player: userId, gameRoom: room._id}).then(stagedCards => {
+        //                 // console.log(cardsAllowed);
+        //                 // console.log(stagedCards);
+
+        //                 if(stagedCards && isEqual(stagedCards.gameRoom, room._id) && stagedCards.cards && (stagedCards.cards.length === cardsAllowed)){
+        //                     //console.log(stagedCards);
+        //                     response.send('player already added. cards already staged');
+        //                 } else {
+        //                     Card.find({player: userId, active: true}).sort({'created': -1}).limit(cardsAllowed)
+        //                         .then(cards => {
+        //                             if(cards.length < cardsAllowed){
+        //                                 // create new cards to make up 
+        //                                 console.log('creating new cards');
+        //                                 const newCardsArray = [];
+        //                                 const newCardsNeeded = cardsAllowed - cards.length;
+        //                                 for(let i = 0; i < newCardsNeeded; i++){
+        //                                     const newCardCreationObj = Card.create({player: user._id});
+        //                                     newCardsArray.push(newCardCreationObj);
+        //                                 }
+        //                                 Promise.all(newCardsArray).then(() => {
+        //                                     const stagedCards = {};
+        //                                     stagedCards.gameRoom = room._id;
+        //                                     stagedCards.player = userId;
+        //                                     stagedCards.cards = cards.map(card => {
+        //                                         return card._id;
+        //                                     });
+        //                                     StagedCards.create(stagedCards).then(() => {
+        //                                         response.send('User added to room. Cards staged.');
+        //                                     }).catch(error => response.status(422).json(error));
+        //                                 })
+        //                             } else {
+        //                                 const stagedCards = {};
+        //                                 stagedCards.gameRoom = room._id;
+        //                                 stagedCards.player = userId;
+        //                                 stagedCards.cards = cards.map(card => {
+        //                                     return card._id;
+        //                                 });
+        //                                 StagedCards.create(stagedCards).then(createdStagedCards => {
+        //                                     response.send('User added to room. Cards staged.');
+        //                                 }).catch(error => response.status(422).json(error));
+        //                             }
+
+        //                         })
+        //                 }
+        //             })
+        //         })
+        //         .catch(error => response.status(422).json(error));
+                
+        //     } else {
+        //         response.status(404).send('room not found');
+        //     }
+        // })
+        // .catch(error => response.status(422).json(error));
     },
     leaveRoom: function(request, response){
         const gameRoomId = request.params.gameRoomId;
