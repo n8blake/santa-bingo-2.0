@@ -115,6 +115,7 @@ function ProfilePage(props){
         } else {
             setChanges(false);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [color, dispatch, displayName, firstName, lastName, profileUserData, state.user])
 
     return(

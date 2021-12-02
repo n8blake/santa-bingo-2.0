@@ -6,6 +6,9 @@ router.route('/')
     .get(gameRoomController.find)
     .post(gameRoomController.create)  
 
+router.route('/players/')
+    .post(gameRoomController.find);
+
 // Matches with '/api/gamerooms/:id
 router.route("/:id")
     .get(gameRoomController.findById)

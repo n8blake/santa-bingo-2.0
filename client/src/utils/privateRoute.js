@@ -50,7 +50,7 @@ function PrivateRoute({ children, ...rest }) {
         setChecking(false);
       }
       }
-    }, [state.loggedIn])
+    }, [dispatch, state.loggedIn, state.token])
 
     return (
         

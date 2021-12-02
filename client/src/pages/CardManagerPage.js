@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useStoreContext } from "../utils/GlobalState";
 import API from "../utils/API";
@@ -38,12 +38,16 @@ function CardManagerPage(props){
         setWheelValue(event.deltaX);
     }
 
-    const fetchCards = () => {
-        API.getCards(state.userID)
+    const fetchCards = (index) => {
+        console.log(state.user);
+        API.getCards(state.user._id)
             .then(response => {
                 console.log(response);
                 if(response.data){
                     setCards(response.data);
+                    if(index){
+                        setActiveCardIndex(index);
+                    }
                 }
             })
             .catch(error => {
@@ -53,11 +57,10 @@ function CardManagerPage(props){
 
     const addNewCard = () => {
         const oldCardsLength = cards.length;
-        API.addNewCard()
+        API.getCard("new")
             .then(response => {
                 if(response.data){
-                    setCards(response.data);
-                    setActiveCardIndex(oldCardsLength);
+                    fetchCards(oldCardsLength);
                 }
             })
             .catch(error => {
@@ -68,13 +71,14 @@ function CardManagerPage(props){
     const deactivateCard = () => {
         const card = cards[activeCardIndex];
         if(cards.length > 1){
-            API.deactivateCard(card.uuid)
+            API.deactivateCard(card._id)
             .then(response => {
-                console.log(response);
+                //console.log(response);
                 if(response.data){
-                    setCards(response.data);
                     if(activeCardIndex > 0){
-                        setActiveCardIndex(activeCardIndex - 1);
+                        fetchCards(activeCardIndex - 1);
+                    } else {
+                        fetchCards();
                     }
                 } 
             })
@@ -116,7 +120,7 @@ function CardManagerPage(props){
             window.removeEventListener('wheel', handleScroll);
         }
 
-    }, [activeCardIndex, cards, debouncedWheelValue, wheelValue])
+    }, [activeCardIndex, cards, debouncedWheelValue, wheelValue, state.user])
 
     return(
         <div className="cardManagerContainer" >
@@ -129,15 +133,15 @@ function CardManagerPage(props){
                 <div className="activeCardControls">
                     { cards.length > 1 ? (
                         <button className="btn text-light activeCardControlBtn mx-2" onClick={deactivateCard}>
-                            <i class="bi bi-trash"></i>
+                            <i className="bi bi-trash"></i>
                         </button>
                     ) : (
                         <span></span>
                     )}
                     {
-                        cards.length > 0 ? (
-                            <Link to={`/cards/print/${cards[activeCardIndex].uuid}`} className="btn text-light activeCardControlBtn mx-2" >
-                                <i class="bi bi-printer"></i>
+                        cards.length > 0 && cards[activeCardIndex] ? (
+                            <Link to={`/card/print/${cards[activeCardIndex]._id}`} className="btn text-light activeCardControlBtn mx-2" >
+                                <i className="bi bi-printer"></i>
                             </Link>
                         ) : (
                             <span></span>

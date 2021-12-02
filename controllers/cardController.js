@@ -76,28 +76,20 @@ module.exports = {
             });
     },
     activateCard: function(request, response){
-        if(typeof request.body.active === undefined || typeof request.body.active === 'boolean'){
+        if(typeof request.body.active === undefined || typeof request.body.active !== 'boolean'){
             response.status(400).json('bad request');
-        }
-        Card
+        } else {
+            Card
             .findOne({_id: request.params.id})
             .then(card => {
                 if(card && (request.user.role === 'admin' || isEqual(card.player._id, request.user._id))){
                     card.active = request.body.active;
                     card.save().then(updatedCard => {
-                        Card.populate(updatedCard, {
-                            path: 'player',
-                            select: '-email -password -created -__v', 
-                            model: 'User'
-                        }, function(error, card){
-                            if(error){
-                                response.status(422).json(error);
-                            } else if(!card){
-                                response.status(422).json(card);
-                            } else {
-                                response.json(card);
-                            }
-                        })
+                        if(updatedCard){
+                            response.json(updatedCard);
+                        } else {
+                            response.status(400).send('Bad request');
+                        }
                     })
                     .catch(error => response.status(422).json(error));
                 } else {
@@ -108,6 +100,8 @@ module.exports = {
                 console.log(error);
                 response.status(422).json(error);
             });
+        }
+        
     },
     createMany: async function(userId, cardCount) {
         // create 3 cards
