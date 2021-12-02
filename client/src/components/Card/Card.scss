@@ -4,7 +4,7 @@
 	max-width: 460pt; 
 	background-color: #FFF; 
 	color: #000; 
-	padding: 20pt; 
+	padding: 10pt; 
 	margin: auto; 
 	border-radius: 0.5em;
 }
@@ -18,8 +18,13 @@ table.bingoCard{
 th.bingoCardHeader{
 	font-weight: bolder;
 	font-size: 32pt; 
-
 }
+
+th.bingoCardHeader.bingo-header-thumb{
+	font-weight: bolder;
+	font-size: 8pt; 
+}
+
 tr.bingoCardRow{
 	text-align: center;
 	/*border-top: solid;
@@ -54,14 +59,21 @@ td.bingoCellInteractable.called:hover{
 	cursor: pointer;
 }
 
-td.bingoCell img {
+img {
 	margin: 10pt;
 	/*width: 50px;
 	height: 50px;*/
 }
+img.bingo-img-thumb {
+	margin: 2pt;
+}
+
 
 @media only screen and (max-width: 400px) {
 	td.bingoCell img {
 		  margin: 3pt;
 	  }
+	  td.bingoCell img.bingo-img-thum {
+		margin: 2pt;
+	}
   }
