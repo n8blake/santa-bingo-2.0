@@ -15,6 +15,7 @@ const PlayerSubSchema = new Schema({
 })
 
 const GameSchema = new Schema({
+    gameRoom: { type: Schema.Types.ObjectId, required: true, ref: 'GameRoom' },
     start_time: { type: Date, required: true, default: new Date() },
     end_time: { type: Date },
     inGame: { type: Boolean, required: true, default: true},

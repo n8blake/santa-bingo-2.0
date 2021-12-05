@@ -9,43 +9,48 @@ module.exports = (io, socket) => {
             socket.emit('joined', room);
         }
     });
-    socket.on('start', function (room) {
-        console.log(`Starting game ${room}`);
-        if(room){
-            console.log(socket.request.session);
-            const gameUUID = room;
-            const userUUID = socket.request.session.user.uuid;
-            gameController.startGame(gameUUID, userUUID)
-                .then(result => {
-                    console.log(result);
-                    if(result){
-                        socket.to(room).emit('started', 'game started');
-                    } else {
-                        // uhhh idk?
-                        socket.to(room).emit('ended', 'game ended');
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
+    socket.on('start', function (emission) {
+        console.log(emission);
+        console.log(`Starting game ${emission.gameRoom}`);
+        if(emission.gameRoom){
+            socket.to(emission.gameRoom).emit('started', emission.game);
         }
     });
     socket.on('end', function (room) {
         console.log(`Ending game ${room}`);
         if(room){
             console.log(socket.request.session);
-            const gameUUID = room;
-            const userUUID = socket.request.session.user.uuid;
-            gameController.endGame(gameUUID, userUUID)
-                .then(result => {
-                    console.log(result);
-                    if(result){
-                        socket.to(room).emit('ended', 'game ended');
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
+            //const gameUUID = room;
+            //const userUUID = socket.request.session.user._id;
+            socket.to(room).emit('ended', 'game ended');
+            
+        }
+    });
+    socket.on('roomsUpdate', function(room){
+        console.log(`Updating room: ${room}`);
+        if(room){
+            socket.to(room).emit('roomsUpdate', room);
+        }
+    });
+    socket.on('closeRoom', function(room) {
+        console.log(`Closing room ${room}`);
+        if(room){
+            socket.to(room).emit('close', room);
+            socket.to('main').emit('roomsUpdate', room);
+        }
+    });
+    socket.on('ejectPlayer', function(emission){
+        console.log(`Player ejection:`)
+        console.log(emission);
+        if(emission.gameRoom && emission.playerId){
+            socket.to(emission.gameRoom).emit('ejectPlayer', emission.playerId);
+        }
+    });
+    socket.on('nextNumberCalled', function(emission){
+        console.log('next number called');
+        console.log(emission);
+        if(emission.gameRoom && emission.game){
+            socket.to(emission.gameRoom).emit('nextNumberCalled', emission.game)
         }
     });
 }

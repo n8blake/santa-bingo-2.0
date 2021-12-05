@@ -47,7 +47,11 @@ module.exports = {
             ]
             })
             .then(game => {
-                response.send(game);
+                if(game){
+                    response.send(game);
+                } else {
+                    reponse.status(404).send('No game found');
+                }
             }).catch(error => {
                 console.log(error);
                 response.status(422).json(error)
@@ -88,6 +92,7 @@ module.exports = {
                             StagedCards.find({gameRoom: gameRoom._id}).then(stagedCardsArray => {
                                 console.log(stagedCardsArray);
                                 const newGame = {};
+                                newGame.gameRoom = gameRoom._id;
                                 newGame.settings = gameRoom.settings;
                                 newGame.numbers = [{number: 0}];
                                 newGame.creator = request.user._id;
@@ -155,9 +160,9 @@ module.exports = {
                                 gameRoom.save().then(() => {
                                     response.status(200).send('game ended');
                                 })
-                                .catch(error => response.status(422).json(error))
+                                .catch(error => response.status(422).json(error.message))
                             })
-                            .catch(error => response.status(422).json(error))
+                            .catch(error => response.status(422).json(error.message))
                         })
                     } else {
                         response.status(400).send('Game not in room');
@@ -168,7 +173,7 @@ module.exports = {
             })
             .catch(error => {
                 console.log(error);
-                response.status(422).json(error);
+                response.status(422).json(error.message);
             })
         } else {
             response.status(400).send('Bad request');

@@ -15,12 +15,17 @@ function Header() {
 			{ state.inGame ? (
 				<div className="game-bg bg-grad-green"></div>
 			) : (
+				<>
 				<div className="game-bg bg-grad-red"></div>
+				
+				</>
 			)}
-			<div className="jumbotron">
+			<div className={`${state.inGame ? ("icon-corner") : ("jumbotron")} `}>
 				<Link to={'/'} style={{ textDecoration: 'none' }}>
 					{ state.inGame ? (
-						<img className="logoHero" src={HeaderGreen} alt="Santa Bingo"/>
+						<>
+						<img className="logo-icon" src={`/images/santa/santa_white.svg`} alt="Santa Bingo"/>
+						</>
 					) : (
 						<img className="logoHero" src={HeaderRed} alt="Santa Bingo"/>
 					)}
@@ -29,10 +34,10 @@ function Header() {
 			<nav className="pageLinkBtn">
 				<Link to="/profile" style={{ textDecoration: 'none' }}>
 					{
-						state.user ? (
+						state.user && state.user.displayName ? (
 							<span className="user-display-monogram">{state.user.displayName}</span>
 						) : (
-							<i className="bi bi-person-circle"></i>
+							<></>
 						)
 					}
 					

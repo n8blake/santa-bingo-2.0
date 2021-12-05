@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { User, Card, Game, GameRoom, GameSettings, StagedCards, PlayerMark, Prize, } = require("../models");
+const { User, Card, Game, GameRoom, GameSettings, StagedCards, Mark, Prize, } = require("../models");
 const { generateCard } = require("../utils/CardGenerator");
 const chalk = require("chalk");
 
@@ -17,7 +17,7 @@ User.remove({}).then(() => {
     const gamerooms = GameRoom.remove({});
     const gamesettings = GameSettings.remove({});
     const stagedcards = StagedCards.remove({});
-    const playermarks = PlayerMark.remove({});
+    const playermarks = Mark.remove({});
     const prizes = Prize.remove({});
     
     const promiseArray = [cards, games, gamerooms, gamesettings, stagedcards, playermarks, prizes];

@@ -15,6 +15,9 @@ module.exports = {
                 findQuery.active = true;
             }
         }
+        if(request.body && request.body.cards){
+            findQuery._id = { $in: request.body.cards }
+        }
         console.log(findQuery);
         Card.find(findQuery)
             .populate({

@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import Modal from '../Modal/Modal';
 import './GameSettings.scss';
+import useDebounce from '../../utils/debounceHook';
 
 function GameSettings(props) {
 
     const [showCloseGameModal, setShowCloseGameModal] = useState(false);
+    const [roomName, setRoomName] = useState(props.roomName);
+    const [changeEvent, setChangeEvent] = useState();
+    const debouncedChangeEvent = useDebounce(changeEvent, 500);
 
     const modalActionInterceptor = (event) => {
         if(event === 'confirm'){
@@ -12,6 +16,18 @@ function GameSettings(props) {
         }
         setShowCloseGameModal(false);
     }
+
+    const handleChange = (event) => {
+        setRoomName(event.target.value);
+        setChangeEvent(event);
+    }
+
+    useEffect(() => {
+        if(debouncedChangeEvent){
+            props.handleChange(debouncedChangeEvent);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debouncedChangeEvent])
 
     return(
         <div className="game-settings-pane">
@@ -21,17 +37,13 @@ function GameSettings(props) {
             <div className="container">
                 <div className="settings-title">SETTINGS</div>
                 <hr></hr>
-                {
-                    props.roomName ? (
-                        <div className="settings-input-wrapper">
-                            <div className="descriptor"><small>
-                                Room Name
-                                </small></div>
-                            <input type="text" name="roomName" onChange={props.handleChange} value={props.roomName}></input>
-                            <hr></hr>
-                        </div>
-                    ) : (<></>)
-                }
+                <div className="settings-input-wrapper">
+                    <div className="descriptor"><small>
+                        Room Name
+                        </small></div>
+                    <input type="text" name="roomName" onChange={handleChange} value={roomName}></input>
+                    <hr></hr>
+                </div>
                 {
                     props.gameSettings && (false === true) ? (
                         <div>

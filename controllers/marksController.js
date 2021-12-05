@@ -14,6 +14,11 @@ module.exports = {
             if(request.query.card){
                 findQuery.card = request.query.card;
             }
+            if(request.body && request.body.cards && request.body.game && request.body.player){
+                findQuery.game = request.body.game;
+                findQuery.player = request.body.player;
+                findQuery.card = { $in: request.body.cards }
+            }
             
             Mark.find(findQuery).then(marks => {
                 if(marks && marks.length > 0){
@@ -34,10 +39,18 @@ module.exports = {
         }
     },
     createMark: function(request, response){
-        if(request.body && request.body.card && request.body.player && request.body.game && request.body.number){
+        console.log(`Creating mark...`);
+        //console.log(request.body );
+        // console.log(request.body.card);
+        // console.log(request.body.player);
+        // console.log(request.body.game);
+        // console.log(request.body.number);
+
+        if(request.body && request.body.card && request.body.player && request.body.game && request.body.number > -1){
+            console.log(request.body);
             Mark.findOne({game: request.body.game, player: request.body.player, card: request.body.card, number: request.body.number})
                 .then(mark => {
-                    if(mark && mark.number) {
+                    if(mark) {
                         response.status(200).json(mark);
                     } else {
                         Game.findOne({_id: request.body.game, inGame: true}).then(game => {
@@ -80,7 +93,7 @@ module.exports = {
                                                 if(rowIndex > -1){
                                                     newMark.row = rowIndex;
                                                     newMark.column = i;
-                                                } else if(!newMark.row && !newMark.column) {
+                                                } else if(!newMark.row && newMark.row !== 0 && !newMark.column && !newMark.column !== 0) {
                                                     newMark.row = -1;
                                                     newMark.column = -1;
                                                 }
@@ -95,6 +108,7 @@ module.exports = {
                                                     response.status(422).json(error)
                                                 })
                                             } else {
+                                                console.log('number not on card');
                                                 response.status(400).send('Number not on card');
                                             }
                                         })
@@ -103,6 +117,7 @@ module.exports = {
                                     }
                                 }
                             } else {
+                                console.log('no game found');
                                 response.status(400).json('No game found');
                             }
                         })
@@ -115,19 +130,27 @@ module.exports = {
                 })
             
         } else {
+            console.log('bad request');
+            console.log(request.body);
             response.status(400).send('Bad request.');
         }
     }, 
     removeMark: function(request, response){
+        console.log(request.params.id);
         Mark.findOne({_id: request.params.id, locked: false}).then(mark => {
-            if(mark.player === request.user._id || request.user.role === 'admin'){
+            console.log(mark);
+            if(isEqual(mark.player, request.user._id) || request.user.role === 'admin'){
                 Mark.deleteOne({_id: request.params.id}).then(dbResponse =>{
                     response.json(dbResponse);
                 })
-                .catch(error => response.status(422).json(error))
+                .catch(error => response.status(422).json(error.message))
             } else {
                 response.status(403).send('Unauthorized');
             }
+        })
+        .catch(error => {
+            console.log(error);
+            response.status(422).json(error.message)
         })
     }  
 }

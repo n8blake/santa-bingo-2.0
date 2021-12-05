@@ -3,7 +3,8 @@ const cardController = require("../../controllers/cardController");
 
 // Match with '/api/cards/'
 router.route('/')
-    .get(cardController.getCards);
+    .get(cardController.getCards)
+    .post(cardController.getCards);
 
 router.route('/new/')
     .get(cardController.newCard);

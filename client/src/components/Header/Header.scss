@@ -63,6 +63,29 @@
 	cursor: pointer;
 }
 
+.logoHero.in-game {
+	display: none;
+}
+
+.logo-icon {
+	position: fixed;
+	width: 36pt;
+	height: 36pt;
+	top: 12pt;
+	left: 20pt;
+	opacity: 0.4;
+	transition: opacity .25s;
+	z-index: 2;
+}
+
+.logo-icon:hover {
+	opacity: 0.9;
+}
+
+.icon-corner {
+
+}
+
 .user-display-monogram {
 	background-color: white;
 	padding: 6pt;

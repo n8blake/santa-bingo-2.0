@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Redirect } from "react-router-dom";
-//import { useStoreContext } from "../utils/GlobalState";
+import { SocketContext } from "../utils/socket";
 import API from "../utils/API";
 
 import './NewGameRoom.scss';
 
 function NewGamePage() {
+
+
+    const socket = useContext(SocketContext);
 
     const [gameRoomName, setGameRoomName] = useState("");
     const [newRoom, setNewRoom] = useState();
@@ -18,6 +21,7 @@ function NewGamePage() {
             console.log(`Submitting ${gameRoomName}`);
             API.createNewGameRoom(gameRoomName).then(response => {
                 console.log(response);
+                socket.emit('roomsUpdate', 'main');
                 setNewRoom(response.data);
             })
             .catch(error => console.log(error));

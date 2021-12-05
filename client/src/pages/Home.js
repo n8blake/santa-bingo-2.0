@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { useStoreContext } from "../utils/GlobalState";
+import { SocketContext } from "../utils/socket";
 import API from "../utils/API";
 import MiniCardsViewer from '../components/MiniCardsViewer/MiniCardsViewer';
 import './Home.scss';
@@ -10,6 +11,8 @@ import { SET_IN_GAME } from "../utils/actions";
 function Home(){
     
     const [state, dispatch] = useStoreContext();
+    const socket = useContext(SocketContext);
+    const [joinedMainRoom, setJoinedMainRoom] = useState(false);
     const [cards, setCards] = useState([]);
     const [gameRooms, setGameRooms] = useState([]);
     const [myGameRooms, setMyGameRooms] = useState([]);
@@ -18,9 +21,55 @@ function Home(){
 
     const joinRoom = (roomId) => {
         API.joinGameRoom(roomId, state.user._id).then(response => {
-            console.log(response);
+            console.log(`Emitting ${roomId}`);
+            socket.emit('roomsUpdate', roomId);
         })
         .catch(error => console.log(error))
+    }
+
+
+    const loadRooms = async () => {
+        if(state.user && state.user._id){
+            const players = [state.user._id];
+            await API.getRoomsByPlayers(players).then(response => {
+                //console.log(response.data);
+                if(response.data){
+                    setMyGameRooms(response.data)
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                setMyGameRooms([])
+            })
+            await API.getCards(state.user._id).then(response => {
+                if(response.data){
+                    setCards(response.data);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            })
+            await API.getRoomsByNotPlayers(players).then(response => {
+                //console.log(response.data);
+                if(response.data){
+                    setGameRooms(response.data)
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                setGameRooms([])
+            })
+        }
+    }
+
+    const handleRoomsUpdate = (data) => {
+        loadRooms();
+    }
+
+    const handleJoined = (data) => {
+        if(data === 'main'){
+            setJoinedMainRoom(true);
+        }
     }
 
     useEffect(() => {
@@ -29,51 +78,41 @@ function Home(){
             inGame: false
         });
         
-        //TO DO: QUERY TO RETURN LIST OF 'MY GAME ROOMS'
-        if((!myGameRooms || myGameRooms.length === 0) && state.user){
-            const players = [state.user._id];
-            API.getRoomsByPlayers(players).then(response => {
-                //console.log(response.data);
-                if(response.data){
-                    setMyGameRooms(response.data)
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            })
+        if(state.user && state.user._id){
+            loadRooms();
         }
 
-        if(!gameRooms || gameRooms.length === 0 && state.user && state.user._id){
-            const players = [state.user._id];
-            API.getRoomsByNotPlayers(players).then(response => {
-                //console.log(response.data);
-                if(response.data){
-                    setGameRooms(response.data)
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            })
+        if(!joinedMainRoom){
+            socket.emit('join', 'main');
         }
 
-        if(!cards || cards.length === 0){
-            API.getCards(state.user._id).then(response => {
-                if(response.data){
-                    setCards(response.data);
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            })
+        socket.on('roomsUpdate', handleRoomsUpdate);
+        socket.on('joined', handleJoined);
+
+        return () => {
+            socket.off('roomsUpdate', handleRoomsUpdate);
+            socket.off('joined', handleJoined);
         }
 
-    }, [dispatch, gameRooms, myGameRooms, state.user])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [state.user])
 
     const myGameRoomsListItems = myGameRooms.map(room => {
+        //console.log(room);
         return(<li className="list-group-item m-2" key={room._id}>
+            
             <Link to={`/gameroom/${room._id}`} className="d-flex justify-content-between gameName">
-                <div>
-                    <div className="gameName">{room.roomName} </div>
+                <div className="gameName">
+                    <div className="gameName position-relative ml-2">
+                        {room.roomName} 
+                    {
+                        room.inGame ? (<span class="game-badge position-absolute badge rounded-pill">
+                        game in progress
+                        <span class="visually-hidden">game in progress</span>
+                      </span>) : (<></>)
+                    }
+                    </div>
+                    
                     <small className="text-light game-room-detail">{room.creator.firstName} {room.creator.lastName}</small>
                 </div>
                 <span to={""} className="text-light m-2"><i className="bi bi-caret-right-fill"></i></span>
@@ -84,6 +123,9 @@ function Home(){
     const gameRoomsListItems = gameRooms.map(room => {
         return(
             <li className="list-group-item m-2" key={room._id}>
+                {
+                    room.inGame ? (<span>in game</span>) : (<></>)
+                }
                 <Link to={`/gameroom/${room._id}`} onClick={() => joinRoom(room._id)} className="d-flex justify-content-between gameName">
                     <div>
                         <div className="gameName">{room.roomName} </div>
@@ -94,23 +136,23 @@ function Home(){
             </li>
         )
     })
-
+//<MiniCardsViewer cardTitle={cardTitle} cards={cards} />
     return(
         <div className="container">
-            <div className="d-flex justify-content-center">
-                <span>MY CARDS</span>
-            </div>
-            <MiniCardsViewer cardTitle={cardTitle} cards={cards} />
+            
+            
             <hr></hr>
             {
                 myGameRooms.length > 0 ? (
                     <div>
-                        <div className="d-flex justify-content-between">
-                            <span>My GAME ROOMS</span>
-                            <Link to={"/newgame/"} className="btn btn-sm btn-outline-light">NEW ROOM</Link>
+                        <div className="d-flex justify-content-center">
+                            <span className="title title-red">MY GAME ROOMS</span>
                         </div>
                         <div className="list-group-flush">
                             {myGameRoomsListItems}
+                        </div>
+                        <div className="d-flex justify-content-center">    
+                            <Link to={"/newgame/"} className="btn btn-sm btn-outline-primary">CREATE NEW ROOM</Link>
                         </div>
                     </div>
                 ) : (
@@ -131,7 +173,7 @@ function Home(){
                 gameRoomsListItems && gameRoomsListItems.length > 0 && gameRoomsListItems[0] ? (
                     <div>
                         <div className="d-flex justify-content-center">
-                            <span>PUBLIC GAME ROOMS</span>
+                            <span className="title title-red">GAME ROOMS</span>
                         </div>
                         <div className="list-group-flush">
                             {gameRoomsListItems}

@@ -1,2 +1,14 @@
 @import '../theme-colors.scss';
 
+body {
+    background-color: #001704;
+    position: relative;
+}
+
+.game-controls {
+    position: fixed;
+    bottom: 20pt;
+    margin: auto;
+    width: 50%;
+    z-index: 4;
+}

@@ -1,29 +1,31 @@
-import React, { useEffect, useState, useContext, useCallback } from "react";
-import { BrowserRouter as Router, Route, Redirect, useParams, Link } from "react-router-dom";
+import React, { useEffect, useState, useContext } from "react";
+import { Redirect, useParams, Link } from "react-router-dom";
 import { useStoreContext } from "../utils/GlobalState";
 import API from "../utils/API";
 import { SocketContext } from "../utils/socket";
-import './GamePage.scss';
-import { validate } from 'uuidv4';
 import Card from '../components/Card/Card';
-import CalledCards from "../components/CalledCards/CalledCards";
+import CardList from "../components/CardList/CardList";
+import CalledNumbers from "../components/CalledNumbers/CalledNumbers";
 import { SET_IN_GAME } from "../utils/actions";
 import NoMatch from "./NoMatch";
+
+import './GamePage.scss';
 
 function GamePage(props){
 
     const [state, dispatch] = useStoreContext();
     const socket = useContext(SocketContext);
 
-    let { uuid } = useParams();
-    //const [inGame, setInGame] = useState(false);
+    let { id } = useParams();
     const [gameManager, setGameManager] = useState(false);
     const [joinedGame, setJoinedGame] = useState(false);
-    const [gameData, setGameData] = useState(false);
-    const [gameName, setGameName] = useState("");
+    const [game, setGame] = useState(false);
+    //const [gameRoom, setGameRoom] = useState();
+    const [cards, setCards] = useState([]);
+    const [marks, setMarks] = useState([]);
     const [lobby, setLobby] = useState([]);
-    const [validUuid, setValidUuid] = useState(false);
-    const [badUuid, setBadUuid] = useState(false);
+    const [gameError, setGameError] = useState(false);
+    const [endingGame, setEndingGame] = useState(false);
 
     const lobbyList = lobby.map(player => {
         return(<li className="list-group-item" key={player._id}>
@@ -35,147 +37,213 @@ function GamePage(props){
         </li>)
     })
 
-    const startGame = () => {
-        socket.emit("start", uuid);
-        dispatch({
-            type: SET_IN_GAME,
-            inGame: true
+
+    const updateMarks = () => {
+        const cardIds = cards.map(card => {
+            return card._id;
+        })
+        API.getMarks(game._id, state.user._id, cardIds).then(response => {
+            if(response.data){
+                console.log(response.data);
+                setMarks(response.data)
+            }
+        }).catch(error => {
+            console.log(error.response.status);
+            if(error.response.status === 404){
+                setMarks([])
+            }
         });
     }
 
+    let lockMarkAPI = false;
+    const cardClickHandler = (event) => {
+        if(event.card && !event.mark && !lockMarkAPI){
+            console.log(`Submitting mark: ${event.number}`)
+            lockMarkAPI = true;
+            API.markCard(game._id, event.card._id, state.user._id, event.number).then(response => {
+                if(response.data){
+                    updateMarks();
+                }
+                lockMarkAPI = false;
+            })
+            .catch(error => {
+                console.log(error);
+                lockMarkAPI = false;
+            })
+        } else if(event.mark && !lockMarkAPI) {
+            //unmark
+            console.log('unmarking');
+            console.log(event.mark);
+            lockMarkAPI = true;
+            API.removeMark(event.mark._id).then(response => {
+                console.log(response.status);
+                updateMarks();
+                lockMarkAPI = false;
+            }).catch(error => {
+                lockMarkAPI = false;
+                console.log(error);
+                updateMarks();
+            });
+        }
+    }
+
     const endGame = () => {
-        socket.emit("end", uuid);
-        dispatch({
-            type: SET_IN_GAME,
-            inGame: false
-        });
+        //console.log(`ending game ${game._id}`);
+        if(game._id && game.gameRoom){
+            API.endGame(game._id, game.gameRoom).then(response => {
+                //console.log(response.data);
+                socket.emit("end", game.gameRoom);
+                setEndingGame(true);
+            })
+            .catch(error => {
+                console.log(error)
+            })
+        } else {
+            console.log("Error ending game");
+        }
+        
     }
 
     const nextCard = () => {
         // next card logic
+        //console.log('Getting next card');
+        API.callNextNumber(game._id).then(response =>{
+            //console.log(response.data);
+            setGame(response.data);
+            socket.emit('nextNumberCalled', {gameRoom: game.gameRoom, game: game._id})
+        }).catch(error => console.log(error))
     }
 
-    const handleGameStart = useCallback((data) => {
-        console.log(data);
-        dispatch({
-            type: SET_IN_GAME,
-            inGame: true
-        });
-    })
-    const handleGameEnd = useCallback((data) => {
-        console.log(data);
-        dispatch({
-            type: SET_IN_GAME,
-            inGame: false
-        });
-    })
-    const handleJoinedGame = useCallback((data) => {
-        console.log(data);
+    const handleGameEnd = (data) => {
+        //console.log(data);
+        setEndingGame(true);
+    }
+
+    const handleJoinedGame = (data) => {
+        //console.log(data);
         setJoinedGame(true);
-    })
+    }
+
+    const handleNextNubmerCalled = (data) => {
+        API.getGame(id).then(response => {
+            if(response.data){
+                setGame(response.data);
+            }
+        }).catch(error => console.log(error))
+    }
 
     useEffect(() => {
-
-        if(uuid){
+        if(id && !gameError){
+            //console.log(id);
             //try to get the game data
-            if(!gameData){
-                API.getGame(uuid).then(response => {
-                    //console.log(response);
+            if(!game && !gameError){
+                API.getGame(id).then(response => {
+                    //console.log(response.data);
                     if(response.data){
-                        setGameData(response.data);
-                        setLobby(response.data.players);
-                        setGameName(response.data.name);
-                        setValidUuid(true);
+                        setGame(response.data);
+                        if(response.data.players){
+                            response.data.players.map(playerObj => {
+                                //console.log(playerObj.player._id === state.user._id);
+                                if(playerObj.player._id === state.user._id){
+                                    //console.log("Getting cards");
+                                    //console.log(playerObj.cards);
+                                    API.getCardsByIds(playerObj.cards).then(response => {
+                                        //console.log(response.data);
+                                        if(response.data){
+                                            setCards(response.data);
+                                        }
+                                    })
+                                    .catch(error => { console.log(error)})
+                                }
+                            })
+                            
+                        }
                         // set game manager
-                        if(response.data.creator === state.user.uuid){
+                        if(response.data.creator._id === state.user._id){
                             setGameManager(true);
                         }
                         // set in game
-                        if(response.data.inGame){
+                        if(!response.data.inGame){
                             dispatch({
                                 type: SET_IN_GAME,
-                                inGame: true
+                                inGame: false
                             });
                         } else {
                             dispatch({
                                 type: SET_IN_GAME,
-                                inGame: false
+                                inGame: true
                             });
                         }
                     }
                 })
                 .catch(error => {
                     console.log(error);
-                    setBadUuid(true);
+                    setGameError(true);
+                    dispatch({
+                        type: SET_IN_GAME,
+                        inGame: false
+                    });
                 });
             }
         }
-        if(validUuid){
-            if(!joinedGame){
-                socket.emit('join', uuid);
-            }
-            socket.on("ended", handleGameEnd);
-            socket.on("started", handleGameStart);
-            socket.on("joined", handleJoinedGame);
+
+        if(id && state.user && cards && cards.length > 0){
+            //get marks for cards
+            //console.log(`Getting marks for ${cards.length} cards`);
+            updateMarks();
+            
         }
+
+        if(!joinedGame && game.gameRoom){
+            socket.emit('join', game.gameRoom);
+        }
+        socket.on("ended", handleGameEnd);
+        socket.on("joined", handleJoinedGame);
+        socket.on("nextNumberCalled", handleNextNubmerCalled);
 
         return () => {
             socket.off("ended", handleGameEnd);
-            socket.off("started", handleGameStart);
             socket.off("joined", handleJoinedGame);
+            socket.off("nextNumberCalled", handleNextNubmerCalled);
+
         }
 
-    }, [uuid, socket, handleGameStart, handleGameEnd, joinedGame, handleJoinedGame, state.user.uuid, validUuid, gameData])
+    }, [state.inGame, state.user, id, cards, gameError])
 
 
-
+//<CalledCards numbers={[0, 34, 5, 62, 75]} />
     const gamePageComponent = 
          (
-            state.inGame ? (
-                <div className="container">
-                    <CalledCards numbers={[0, 34, 5, 62, 75]} />
-    
-                    { gameManager ? (
-                        <div className="d-flex justify-content-center">
-                            <button className="btn btn-light m-2" onClick={nextCard}>Next Card</button>
-                            <button className="btn btn-light m-2" onClick={endGame}>End Game</button>
-                        </div>
-                    ) : (
-                        <div></div>
-                    )}
-                </div>
-            ) : (<div className="container">
-                <h2>{gameName}</h2>
+            <div className="container">
+                {
+                    game && game.numbers ? (<CalledNumbers numbers={game.numbers} />) : (<></>)
+                }
+                
                 { gameManager ? (
-                    <div>
-                        <button className="btn btn-light" onClick={startGame}>Start Game</button>
+                    <div className="game-controls">
+                        <button className="btn btn-light m-2" onClick={nextCard}>Next</button>
+                        <button className="btn btn-light m-2" onClick={endGame}>End Game</button>
                     </div>
                 ) : (
-                    <div></div>
+                    <></>
                 )}
-                <hr></hr>
-                    <div>
-                        <Link to={'/cards/'} className="btn btn-outline-light" >Card Manager</Link>
-                    </div>
-                <hr></hr>
-                <div>Players</div>
-                <ul className="list-group-flush">{lobbyList}</ul>
-            </div>)
+                <div>
+                    <CardList interactable="true" clickHandler={cardClickHandler} cards={cards} marks={marks} calledNumbers={game.numbers}/>
+                </div>
+            </div>
         )
     
     // game page return    
     return(
-        badUuid ? (
+        gameError ? (
             <NoMatch />
         ) : (
-            <span>
-                {gamePageComponent}
-            </span>
+            <>
+                { gamePageComponent }
+                { endingGame ? ( <Redirect to={`/gameroom/${game.gameRoom}`} />) : ( <></> )}
+            </>
         )
-        
-        
-         
-        
+
     )
 }
 
