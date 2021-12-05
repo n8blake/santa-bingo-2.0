@@ -10,10 +10,16 @@ function CalledNumbers(props) {
         setListView(!listView);
     }
 
-    const list = numbers.reverse().map(number => {
+    const list = numbers.map(number => {
         return (
             <div className="called-numbers-list-item">
-                <img className="called-number-img" src={`/images/santa/col_${Math.floor(number.number / 15)}.svg`} alt=""/>
+                {
+                    number.number > 0 ? (
+                        <img className="called-number-img" src={`/images/santa/col_${Math.floor(number.number / 15)}.svg`} alt=""/>
+                    ) : (
+                        <></>
+                    )
+                }                
                 <img className="called-number-img" src={`/images/santa/${number.number}.svg`} alt=""/>
                 <hr className="blue"></hr>
             </div>
@@ -22,7 +28,7 @@ function CalledNumbers(props) {
 
     useEffect(() => {
         setNumbers(props.numbers);
-    }, [props.numbers])
+    }, [props])
 
     return(
         <div className="called-numbers-container">{
@@ -47,8 +53,7 @@ function CalledNumbers(props) {
                                 )
                             ) : (
                                 <>
-                                <img className="called-number-img" src={`/images/santa/col_2.svg`} alt=""/>
-                                <img className="called-number-img" src={`/images/santa/${numbers[numbers.length -1].number}.svg`} alt=""/>
+                                    <img className="called-number-img" src={`/images/santa/${numbers[numbers.length -1].number}.svg`} alt=""/>
                                 </>
                             )
                         }
