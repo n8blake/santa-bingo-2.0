@@ -1,10 +1,10 @@
 const router = require("express").Router();
 const cardController = require("../../controllers/cardController");
-const passport = require('passport');
 
 // Match with '/api/cards/'
 router.route('/')
-    .get(cardController.getCards);
+    .get(cardController.getCards)
+    .post(cardController.getCards);
 
 router.route('/new/')
     .get(cardController.newCard);

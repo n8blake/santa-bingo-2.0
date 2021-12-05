@@ -1,0 +1,15 @@
+.mini-card-viewer {
+    position: relative;
+    height: 190pt;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10pt;
+    grid-auto-rows: minmax(100pt, auto);
+    overflow-x: scroll;
+}
+
+.card-wrapper {
+    width: 160pt;
+    height: 170pt;
+    margin: 10pt;
+}

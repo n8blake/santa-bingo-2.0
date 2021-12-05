@@ -1,0 +1,12 @@
+@media print {
+    body {
+        background-color: white;
+    }
+    .header {
+        display: none;
+    }
+    .bingoCardContainer {
+        width: 8.5in;
+        height: 10in;
+    }
+}

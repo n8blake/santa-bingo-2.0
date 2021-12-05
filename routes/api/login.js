@@ -31,6 +31,9 @@ router.route('/new/')
     .post(loginController.newUserAccount)
 // Matches with '/api/login/old/'
 
+router.route('/check/')
+    .post(loginController.checkForAccount)
+
 router.route("/old/")
     .get((request, response) => {
         if(request.session.user){

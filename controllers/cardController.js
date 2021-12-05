@@ -15,6 +15,9 @@ module.exports = {
                 findQuery.active = true;
             }
         }
+        if(request.body && request.body.cards){
+            findQuery._id = { $in: request.body.cards }
+        }
         console.log(findQuery);
         Card.find(findQuery)
             .populate({
@@ -23,7 +26,7 @@ module.exports = {
                 model: 'User'
             })
             .then(cards => {
-                if(cards){
+                if(cards && cards.length > 0){
                     response.json(cards);
                 } else {
                     response.status(404).send("no cards found matching request");
@@ -49,7 +52,7 @@ module.exports = {
     },
     newCard: function(request, response){
         const newCard = generateCard(request.user._id);
-        newCard.player = request.user._id;
+        //newCard.player = request.user._id;
         Card
             .create(newCard).then(card => {
                if(card){
@@ -76,28 +79,20 @@ module.exports = {
             });
     },
     activateCard: function(request, response){
-        if(typeof request.body.active === undefined || typeof request.body.active === 'boolean'){
+        if(typeof request.body.active === undefined || typeof request.body.active !== 'boolean'){
             response.status(400).json('bad request');
-        }
-        Card
+        } else {
+            Card
             .findOne({_id: request.params.id})
             .then(card => {
                 if(card && (request.user.role === 'admin' || isEqual(card.player._id, request.user._id))){
                     card.active = request.body.active;
                     card.save().then(updatedCard => {
-                        Card.populate(updatedCard, {
-                            path: 'player',
-                            select: '-email -password -created -__v', 
-                            model: 'User'
-                        }, function(error, card){
-                            if(error){
-                                response.status(422).json(error);
-                            } else if(!card){
-                                response.status(422).json(card);
-                            } else {
-                                response.json(card);
-                            }
-                        })
+                        if(updatedCard){
+                            response.json(updatedCard);
+                        } else {
+                            response.status(400).send('Bad request');
+                        }
                     })
                     .catch(error => response.status(422).json(error));
                 } else {
@@ -108,6 +103,16 @@ module.exports = {
                 console.log(error);
                 response.status(422).json(error);
             });
+        }
+        
+    },
+    createMany: async function(userId, cardCount) {
+        // create 3 cards
+        const cards = [];
+        for(let i = 0; i < cardCount; i++){
+            cards.push(generateCard(userId));
+        }
+        return Card.insertMany(cards);
     }
 
 }

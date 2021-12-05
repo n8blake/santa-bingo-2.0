@@ -58,9 +58,9 @@ const configure = function(passport){
                         return done(null, false, { message: 'Invalid auth credentials.' });
                     }
                     const { expirationDate } = decoded
-                    console.log(expirationDate);
+                    if(process.env.NODE_ENV === 'development') console.log(expirationDate);
                     const expirationDateObject = new Date(expirationDate);
-                    if (expirationDateObject < new Date()) {
+                    if (process.env.NODE_ENV !== 'development' && expirationDateObject < new Date()) {
                         //res.status(403).send("Token has expired.")
                         return done(null, false, { message: 'Token has expired.' });
                     }
@@ -68,6 +68,7 @@ const configure = function(passport){
                         if(!user) {
                             return done(null, false)
                         } else {
+                            //if(process.env.NODE_ENV === 'development') console.log(user.email);
                             return done(null, user);
                         }
                     })

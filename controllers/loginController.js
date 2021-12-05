@@ -1,5 +1,5 @@
 const { User } = require("../models");
-//const passport = require('passport');
+const cardController = require("./cardController");
 const jwt = require('jsonwebtoken');
 const nodeMailer = require("nodemailer");
 const generateEmail = require('../utils/EmailGenerator');
@@ -21,8 +21,16 @@ module.exports = {
                 if (expirationDateObject < new Date()) {
                     response.status(403).send("Token has expired. Login again.");
                 } else {
-                    const token = makeToken(decoded.email, 1);
-                    response.status(200).json({token:token});
+                    User.findOne({email: decoded.email}, '-email -created -__v -password')
+                        .then(user => {
+                            const token = makeToken(decoded.email, 1);
+                            response.status(200).json({token, user});
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            response.status(422).json(error.messsage);
+                        })
+                    
                 }
 
             } catch (error) {
@@ -36,8 +44,17 @@ module.exports = {
     defaultLoginLocal: function(request, response){
         console.log(request.user.email);
         request.session.user = request.user;
-        const token = makeToken(request.user.email, 1);
-        response.status(200).json({token:token});
+        const refreshToken = makeToken(request.user.email, 24 * 7); // Refresh token can stay in session for 1 week -- same as session length
+        request.session.refreshToken = refreshToken;
+        User.findOne({email: request.user.email}, '-email -created -__v -password')
+            .then(user => {
+                const token = makeToken(request.user.email, 1);
+                response.status(200).json({token, user});
+            })
+            .catch(error => {
+                console.log(error);
+                response.status(422).json(error.messsage);
+            })
     },
     refreshToken: function(request, response) {
         if(request.headers.token){
@@ -53,8 +70,15 @@ module.exports = {
                 } else {
                     const refreshToken = makeToken(decoded.email, 24 * 7); // Refresh token can stay in session for 1 week -- same as session length
                     request.session.refreshToken = refreshToken;
-                    const token = makeToken(request.user.email, 1);
-                    response.status(200).json({token:token});
+                    User.findOne({email: decoded.email}, '-email -created -__v -password')
+                        .then(user => {
+                            const token = makeToken(decoded.email, 1);
+                            response.status(200).json({token, user});
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            response.status(422).json(error.messsage);
+                        })
                 }
             } catch (error) {
                 console.log(error);
@@ -178,8 +202,26 @@ module.exports = {
                 if(!dbResult){
                     User.create(request.body).then(user => {
                         if(user){
-                            const token = makeToken(user.email, 1);
-                            response.status(200).json({token: token});
+                            // create 3 new cards for this user
+                            cardController.createMany(user._id, 3).then(cards => {
+                                const token = makeToken(user.email, 1);
+                                if(!cards){
+                                    console.log('no cards created');
+                                }
+                                User.findOne({email: request.body.email}, '-email -created -__v -password')
+                                    .then(user => {
+                                        const token = makeToken(request.body.email, 1);
+                                        response.status(200).json({token, user});
+                                    })
+                                    .catch(error => {
+                                        console.log(error);
+                                        response.status(422).json(error.messsage);
+                                    })
+                            })
+                            .catch(error => {
+                                console.log(error);
+                                response.status(422).json(error);
+                            })                            
                         } else {
                             response.status(400).send("error creating user");
                         }
@@ -198,5 +240,20 @@ module.exports = {
             })
         }
         
+    },
+    checkForAccount: function(request, response){
+        if(request.body.email){
+            User.findOne({email: request.body.email}).then(user => {
+                if(user){
+                    response.json(true);
+                } else {
+                    response.status(404).json(false);
+                }
+            })
+            .catch(error => {
+                console.log(error)
+                response.json(error.message);
+            })
+        }
     }
 }

@@ -1,157 +1,271 @@
-const { Game, User } = require('../models');
+const { Game, GameRoom, StagedCards } = require('../models');
+const isEqual = require('lodash.isequal');
+const randomInt = require('../utils/randomInt');
+
 module.exports = {
-    findAll: function(request, response){
-        if(!request.session.token) response.status(401).send();
-        Game
-            .find({})
-            .then(dbModel => {
-                response.json(dbModel);
+    findById: function(request, response){
+        Game.findOne({_id: request.params.id})
+            .populate({
+                path: 'players',
+                populate: {
+                    path: 'player',
+                    select: '-email -password -created -__v', 
+                    model: 'User' 
+                } 
+            })
+            .populate({
+                path: 'creator',
+                select: '-email -password -created -__v', 
+                model: 'User'
+            })
+            .populate({
+                path:'settings',
+                populate: [{
+                    path: 'gameManagers',
+                    populate: {
+                        path: 'manager',
+                        select: '-email -password -created -__v', 
+                        model: 'User' 
+                    }
+                },
+                {
+                    path: 'prizeManagers',
+                    populate: {
+                        path: 'manager',
+                        select: '-email -password -created -__v', 
+                        model: 'User' 
+                    }
+                },
+                {
+                    path: 'gameTypeHistory',
+                    populate: {
+                        path: 'gameType',
+                        select: 'type',
+                        model: 'GameType'
+                    }
+                }
+            ]
+            })
+            .then(game => {
+                if(game){
+                    response.send(game);
+                } else {
+                    reponse.status(404).send('No game found');
+                }
+            }).catch(error => {
+                console.log(error);
+                response.status(422).json(error)
+            })
+    },
+    update: function(request, response){
+        Game.findOne({_id: request.params.id}).then(game => {
+            if(game){
+                // TO DO: add method for checking if a user is a 'game manager' to allow access to update game.
+                if(request.user.role === 'admin' || isEqual(game.creator, request.user._id)){
+                    Game.updateOne({_id: request.params.id}, request.body)
+                        .then(dbResult => response.json(dbResult))
+                        .catch(error => response.status(422).json(error));
+                } else {
+                    response.status(403).send('You are not permitted to modify this resource.');
+                }
+            } else {   
+                response.status(404).send("gameroom not found")
+            }
+        })
+    },
+    startNewGame: function(request, response){
+        // start a new game
+        if(request.body && request.body.gameRoom){
+            GameRoom.findOne({_id: request.body.gameRoom}).then((gameRoom) => {
+                if(gameRoom && gameRoom.players.length > 0){
+                    console.log('starting game creation...')
+                    // run preliminary checks
+                    if(gameRoom.inGame){
+                        response.status(403).send('Game already in progress');
+                    } else {
+                        Game.find({_id: { $in: gameRoom.game}}).then(games => {
+                            games.map(game => {
+                                if(!game.end_time){
+                                    response.status(403).send('Game already in progress');
+                                }
+                            })
+                            StagedCards.find({gameRoom: gameRoom._id}).then(stagedCardsArray => {
+                                console.log(stagedCardsArray);
+                                const newGame = {};
+                                newGame.gameRoom = gameRoom._id;
+                                newGame.settings = gameRoom.settings;
+                                newGame.numbers = [{number: 0}];
+                                newGame.creator = request.user._id;
+                                newGame.players = stagedCardsArray.map(stagedCards => {
+                                    return {
+                                        player: stagedCards.player,
+                                        cards: stagedCards.cards
+                                    }
+                                });
+                                Game.create(newGame).then(game => {
+                                    console.log(game)
+                                    gameRoom.inGame = true;
+                                    if(gameRoom.games && gameRoom.games.length > 0){
+                                        gameRoom.games.push(game._id);
+                                    } else {
+                                        gameRoom.games = [game._id];
+                                    }
+                                    gameRoom.save().then(saveResposne => {
+                                        Game.findOne({_id: game._id}).then(populatedGame => {
+                                            // TO DO:  EMIT EVENT
+                                            // emit to room populatedGame
+                                            if(populatedGame){
+                                                response.json(populatedGame);
+                                            } else {
+                                                response.status(400).send('Error populating game');
+                                            }
+                                        })
+                                    })  
+                                    .catch(error => response.status(400).json(error))
+                                })
+                                .catch(error => response.status(422).json(error));
+                            });
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            response.status(422).json(error);
+                        })
+                    }
+                } else {
+                    response.status(400).send('Error creating game in gameroom');
+                }
+            })
+            .catch(error => response.status(422).json(error));
+        } else {
+            response.status(400).send('Bad request');
+        }
+    },
+    endGame: function(request, response){
+        // end a game
+        if(request.body.gameRoom){
+            GameRoom.findOne({_id: request.body.gameRoom}).then(gameRoom => {
+                if(gameRoom.games && gameRoom.games.length > 0) {
+                    let gameInRoom = false;
+                    for(let i = 0; i < gameRoom.games.length; i++){
+                        if(isEqual(gameRoom.games[i].toString(), request.params.id)){
+                            gameInRoom = true;
+                        }
+                    }
+                    if(gameInRoom){
+                        Game.findOne({_id: request.params.id}).then(game => {
+                            game.end_time = new Date();
+                            game.inGame = false;
+                            game.save().then(() => {
+                                gameRoom.inGame = false;
+                                gameRoom.save().then(() => {
+                                    response.status(200).send('game ended');
+                                })
+                                .catch(error => response.status(422).json(error.message))
+                            })
+                            .catch(error => response.status(422).json(error.message))
+                        })
+                    } else {
+                        response.status(400).send('Game not in room');
+                    }
+                } else {
+                    response.status(400).send('No games in room');
+                }
             })
             .catch(error => {
                 console.log(error);
-                response.status(422).json(error);
-            })       
+                response.status(422).json(error.message);
+            })
+        } else {
+            response.status(400).send('Bad request');
+        }
+        
     },
-    // find by UUID
-    find: function(request, response){
-        if(request.params.id){
-            Game
-                .findOne({uuid: request.params.id})
-                .then(game => {
-                    // find players
-                    //console.log(game);
-                    if(game){
-                        const playerIds = game.players;
-                        User.find({uuid: {$in: playerIds}})
-                        .then(players => {
-                            game.players = players;
-                            response.json(game);
-                        })
-                        .catch(error => {
-                            response.status(422).json(error);
-                        })
+    callNextNumber: function(request, response){
+        // call the next number in a game
+        Game.findOne({_id: request.params.id}).then(game => {
+            if(game && !game.inGame){
+                response.status(403).send('Game is not active.');
+            } else if(game && game.numbers){
+                const calledNumbers = game.numbers.map(numberObject => {
+                    return numberObject.number;
+                })
+                function nextNumber() {
+                    const _nextNumber = randomInt(1, 76);
+                    if(calledNumbers.indexOf(_nextNumber) === -1){
+                        return _nextNumber;
                     } else {
-                        response.status(404).send();
+                        return nextNumber();
                     }
-                    
+                }
+                const number = nextNumber();
+                const nextNumberObject = {
+                    number: number
+                }
+                game.numbers.push(nextNumberObject);
+                game.save().then(() => {
+                    // TO DO: EMIT EVENT
+                    // Emit new number called event
+                    Game.findOne({_id: request.params.id})
+                        .populate({
+                            path: 'players',
+                            populate: {
+                                path: 'player',
+                                select: '-email -password -created -__v', 
+                                model: 'User' 
+                            }
+                        })
+                        .populate({
+                            path: 'creator',
+                            select: '-email -password -created -__v', 
+                            model: 'User'
+                        })
+                        .populate({
+                            path:'settings',
+                            populate: [{
+                                path: 'gameManagers',
+                                populate: {
+                                    path: 'manager',
+                                    select: '-email -password -created -__v', 
+                                    model: 'User' 
+                                }
+                            },
+                            {
+                                path: 'prizeManagers',
+                                populate: {
+                                    path: 'manager',
+                                    select: '-email -password -created -__v', 
+                                    model: 'User' 
+                                }
+                            },
+                            {
+                                path: 'gameTypeHistory',
+                                populate: {
+                                    path: 'gameType',
+                                    select: 'type',
+                                    model: 'GameType'
+                                }
+                            }
+                        ]
+                        })
+                        .then(game => {
+                            response.send(game);
+                        }).catch(error => {
+                            console.log(error);
+                            response.status(422).json(error)
+                        })
                 })
                 .catch(error => {
                     console.log(error);
-                    response.status(422).json(error);
+                    response.status(422).json(error)
                 })
-        }
-    },
-    // create game
-    create: function(request, response){
-        if(!request.session.token) response.status(401).send();
-        // if(request.session.user){
-        //     console.log("USER");
-        //     console.log(request.session.user);
-        // }
-        if(request.body.gameName){
-            const newGame = {
-                name: request.body.gameName,
-                creator: request.session.user.uuid,
-                players: [request.session.user.uuid],
-                numbers: [0]
+            } else {
+                response.status(404).send('Game not found.')
             }
-            Game
-                .create(newGame)
-                .then(dbModel => {
-                    console.log(dbModel);
-                    response.json(dbModel);
-                })
-                .catch(error => response.status(422).json(error))
-        }
+        })
+        .catch(error => {
+            response.status(422).json(error);
+        })
     },
-    // update the game
-    update: function(request, response){
-        if(!request.session.token) response.status(401).send();
-        Game.findOne({uuid: request.params.id})
-            .then(game => {
-                if(game.creator === request.session.user.uuid){
-                    // start
-                    if(request.body.start){
-                        console.log("starting game");
-                        game.start_time = new Date();
-                        game.inGame = true;
-                        Game.updateOne({uuid: game.uuid}, game)
-                            .then(result => {
-                                response.json(result);
-                            })
-                            .catch(error => response.status(422).json(error));
-                    }
-                    // end game
-                    if(request.body.end){
-                        game.end_time = new Date();
-                        game.inGame = false;
-                        Game.updateOne({uuid: game.uuid}, game)
-                            .then(result => {
-                                response.json(result);
-                            })
-                            .catch(error => response.status(422).json(error));
-                    }
-                    // call a number
-                    // change game type ? 
-                }
-                // check numbers agains card for win
-            })
-            .catch(error => {
-                response.status(422).json(error);
-            })    
-    },
-    startGame: function(gameUUID, userUUID){
-        return Game.findOne({uuid: gameUUID})
-            .then(game => {
-                if(game.creator === userUUID){
-                    // start game
-                    console.log("starting game");
-                    game.start_time = new Date();
-                    game.inGame = true;
-                    return Game.updateOne({uuid: gameUUID}, game)
-                        .then(result => {
-                            console.log(result);
-                            return result;
-                        })
-                        .catch(error => {
-                            console.log(error);
-                            return error;
-                        });
-                } else {
-                    return;
-                }
-            })
-            .catch(error => {
-                console.log(error);
-                return error;
-            })
-    },
-    endGame: function(gameUUID, userUUID){
-        return Game.findOne({uuid: gameUUID})
-            .then(game => {
-                if(game.creator === userUUID){
-                    // end game
-                    console.log("ending game");
-                    game.end_time = new Date();
-                    game.inGame = false;
-                    return Game.updateOne({uuid: gameUUID}, game)
-                        .then(result => {
-                            console.log(result);
-                            return result;
-                        })
-                        .catch(error => {
-                            console.log(error);
-                            return error;
-                        });
-                } else {
-                    return;
-                }
-            })
-            .catch(error => {
-                console.log(error);
-                return error;
-            })
-    }
-        
-    // 
+
+    
 }

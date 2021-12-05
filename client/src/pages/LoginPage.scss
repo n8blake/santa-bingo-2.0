@@ -57,9 +57,14 @@ input:focus {
   }
   .form-signin input[type="email"] {
     margin-bottom: -1px;
+    
+  }
+
+  .email-group {
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
   }
+
   .form-signin input[type="password"] {
     margin-bottom: 10px;
     border-top-left-radius: 0;
@@ -91,6 +96,32 @@ input:focus {
     border-bottom-left-radius: 4px;
   }
 
+  .email-alone{
+    border-radius: 4pt;;
+  }
+
   .sr-only {
       display: none;
   }
+
+  .snowflake {
+    width: 64pt;
+    height: 64pt;
+
+  }
+
+  .spinner {
+    animation-name: spin;
+    animation-duration: 5000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear; 
+  }
+
+  @keyframes spin {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+}

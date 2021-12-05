@@ -1,10 +1,14 @@
+@import '../../theme-colors.scss';
+
 .bingoCardContainer {
+	position: relative;
 	width: 100%; 
 	height: 100%; 
-	max-width: 460pt; 
 	background-color: #FFF; 
 	color: #000; 
-	padding: 20pt; 
+	padding: 10pt; 
+	min-width: 250pt;
+	max-width: 350pt;
 	margin: auto; 
 	border-radius: 0.5em;
 }
@@ -18,8 +22,13 @@ table.bingoCard{
 th.bingoCardHeader{
 	font-weight: bolder;
 	font-size: 32pt; 
-
 }
+
+th.bingoCardHeader.bingo-header-thumb{
+	font-weight: bolder;
+	font-size: 8pt; 
+}
+
 tr.bingoCardRow{
 	text-align: center;
 	/*border-top: solid;
@@ -28,9 +37,11 @@ tr.bingoCardRow{
 }
 td.bingoCell{
 	width: 20%;
-	border-style: solid;
+	/*border-style: solid;
 	border-width: 0.5pt;
-	border-color: #DDD;
+	border-color: #DDD;*/
+	border-radius: 50%;
+	padding: 4pt;
 }
 
 td.bingoCellInteractable {
@@ -41,10 +52,17 @@ td.bingoCell.called{
 	background-color: #EFFAEE;
 }
 
+td.bingoCell.marked{
+	background-color: $light-pink;
+}
+
 td.bingoCell.called.marked{
 	background-color: #ADD9AA;
 }
 
+td.bingoCell.marked:hover{
+	background-color: #DD8383;
+}
 
 td.bingoCellInteractable:hover{
 	background-color: #EEE;
@@ -54,14 +72,31 @@ td.bingoCellInteractable.called:hover{
 	cursor: pointer;
 }
 
-td.bingoCell img {
-	margin: 10pt;
+img {
+	margin: 6pt;
 	/*width: 50px;
 	height: 50px;*/
 }
+img.bingo-img-thumb {
+	margin: 2pt;
+}
 
-@media only screen and (max-width: 400px) {
+
+@media only screen and (max-width: 800pt) {
 	td.bingoCell img {
 		  margin: 3pt;
 	  }
+	  td.bingoCell img.bingo-img-thum {
+		margin: 2pt;
+	}
+	.bingoCardContainer {
+		/*max-width: 240pt;*/
+	}
+  }
+
+  @media only screen and (max-width: 450px) {
+	.bingoCardContainer {
+		max-width: 350pt;
+		min-width: 225pt;
+	}
   }

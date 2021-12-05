@@ -10,6 +10,7 @@
     "client": "cd client && npm run start",
     "dbtest": "node scripts/dbTest.js",
     "seed": "node scripts/seedDB.js",
+    "seed-users": "node scripts/seedUsersOnly.js",
     "install": "cd client && npm install",
     "build": "cd client && npm run build",
     "heroku-postbuild": "npm run build"

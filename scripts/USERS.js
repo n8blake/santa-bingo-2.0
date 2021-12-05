@@ -3,7 +3,9 @@ const USERS = [
         firstName: "Nate",
         lastName: "Blake",
         displayName: "N8",
+        role: "admin",
         email: "n8blake@mac.com",
+        password:"password",
         color: 'red'
     },
     {
@@ -11,6 +13,7 @@ const USERS = [
       lastName: "Blake",
       displayName: "SB",
       email: "spencer.blake@slcc.edu",
+      password:"password",
       color: 'blue'
   },
   {
@@ -18,6 +21,7 @@ const USERS = [
       lastName: "Cooper",
       displayName: "KC",
       email: "katiedean@mac.com",
+      password:"password",
       color: 'yellow'
   },
   {
@@ -25,6 +29,7 @@ const USERS = [
     lastName: "Roberts",
     displayName: "LR",
     email: "laurabyu@yahoo.com",
+    password:"password",
     color: 'blue'
   },
   {
@@ -32,6 +37,7 @@ const USERS = [
     lastName: "Cooper",
     displayName: "BC",
     email: "blakecooper@email.com",
+    password:"password",
     color: 'yellow'
   }
 ];
