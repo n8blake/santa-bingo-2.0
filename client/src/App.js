@@ -10,6 +10,7 @@ import ProfilePage from "./pages/ProfilePage";
 import NoMatch from "./pages/NoMatch";
 import NewGameRoomPage from "./pages/NewGameRoom";
 import GameRoomPage from "./pages/GameRoomPage";
+import GamePage from "./pages/GamePage";
 import CardManagerPage from "./pages/CardManagerPage";
 import PrintCardPage from "./pages/PrintCardPage";
 
@@ -32,6 +33,7 @@ function App() {
         <Route exact stict path={`/gameroom/:id`} >
             <GameRoomPage />
         </Route> 
+        <Route exact path={"/game/:id"} children={<GamePage />}/>
         <Route exact stict path={"/newgame/"} children={<NewGameRoomPage />}/>
         <Route>
           <NoMatch />
